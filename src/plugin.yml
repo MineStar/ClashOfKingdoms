@@ -1,0 +1,8 @@
+name: ClashOfKingdoms
+main: com.bukkit.gemo.ClashOfKingdoms.CoKCore
+version: 0.50
+commands:
+  cok:
+    description: CoK related commands
+    usage: /cok ...
+            
