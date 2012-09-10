@@ -1,0 +1,4 @@
+name: Clash of Kingdoms
+main: de.minestar.clashofkingdoms.COKCore
+version: ${pom.version}
+depend: [MineStarLibrary]
