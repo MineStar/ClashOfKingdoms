@@ -1,4 +1,4 @@
-package de.minestar.clashofkingdoms.data;
+package de.minestar.clashofkingdoms.enums;
 
 public enum EnumTeam {
     NONE("NONE"),

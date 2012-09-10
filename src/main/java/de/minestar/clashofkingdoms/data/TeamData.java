@@ -4,6 +4,9 @@ import java.util.HashMap;
 
 import org.apache.commons.lang.Validate;
 
+import de.minestar.clashofkingdoms.enums.EnumTeam;
+import de.minestar.clashofkingdoms.utils.BlockVector;
+
 public class TeamData {
     private final EnumTeam team;
     private final BlockBase blockBase;

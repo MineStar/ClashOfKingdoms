@@ -5,6 +5,8 @@ import java.util.HashMap;
 import org.bukkit.ChatColor;
 
 import de.minestar.clashofkingdoms.COKCore;
+import de.minestar.clashofkingdoms.enums.EnumTeam;
+import de.minestar.clashofkingdoms.enums.GameState;
 import de.minestar.clashofkingdoms.manager.GameManager;
 
 public class COKGame {

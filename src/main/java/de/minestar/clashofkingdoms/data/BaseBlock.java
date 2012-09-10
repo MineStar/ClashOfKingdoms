@@ -1,5 +1,7 @@
 package de.minestar.clashofkingdoms.data;
 
+import de.minestar.clashofkingdoms.utils.BlockVector;
+
 public class BaseBlock {
 
     private final BlockVector vector;

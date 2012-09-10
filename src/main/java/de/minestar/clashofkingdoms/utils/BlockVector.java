@@ -1,4 +1,4 @@
-package de.minestar.clashofkingdoms.data;
+package de.minestar.clashofkingdoms.utils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import de.minestar.clashofkingdoms.COKCore;
+import de.minestar.clashofkingdoms.enums.EnumTeam;
 
 public class COKPlayer {
 

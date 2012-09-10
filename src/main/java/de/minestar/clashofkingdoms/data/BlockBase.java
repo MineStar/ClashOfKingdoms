@@ -3,6 +3,8 @@ package de.minestar.clashofkingdoms.data;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import de.minestar.clashofkingdoms.utils.BlockVector;
+
 public class BlockBase {
 
     private int height = 5;
