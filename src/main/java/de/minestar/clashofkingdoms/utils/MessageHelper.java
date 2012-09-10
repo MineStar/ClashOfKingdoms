@@ -6,6 +6,10 @@ import de.minestar.clashofkingdoms.COKCore;
 
 public class MessageHelper {
 
+    public static String getMessage(ChatColor messageColor, String message) {
+        return messageColor + message;
+    }
+
     public static String getFullMessage(ChatColor messageColor, String message) {
         return getFullMessage(ChatColor.AQUA, COKCore.FULLNAME, messageColor, message);
     }

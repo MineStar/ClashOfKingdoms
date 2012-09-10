@@ -4,19 +4,31 @@ import java.util.HashMap;
 
 import org.bukkit.ChatColor;
 
+import de.minestar.clashofkingdoms.COKCore;
 import de.minestar.clashofkingdoms.manager.GameManager;
 
 public class COKGame {
 
-    private final String gameName;
-    private HashMap<String, COKPlayer> playerList;
     private GameManager gameManager;
 
+    private final String gameName;
+    private HashMap<String, COKPlayer> playerList;
     private GameState gameState = GameState.STOPPED;
 
+    // TEAMDATA
+    private HashMap<EnumTeam, TeamData> teamData;
+
     public COKGame(String gameName) {
+        this.gameManager = COKCore.gameManager;
         this.gameName = gameName;
         this.playerList = new HashMap<String, COKPlayer>();
+
+        // TeamData
+        this.teamData = new HashMap<EnumTeam, TeamData>();
+        this.teamData.put(EnumTeam.BLU, new TeamData(EnumTeam.BLU));
+        this.teamData.put(EnumTeam.RED, new TeamData(EnumTeam.RED));
+        this.teamData.put(EnumTeam.NONE, new TeamData(EnumTeam.NONE));
+        this.teamData.put(EnumTeam.REF, new TeamData(EnumTeam.REF));
     }
 
     // ///////////////////////////////////////////////////////////////
@@ -33,10 +45,21 @@ public class COKGame {
         return (this.getPlayer(playerName) != null);
     }
 
-    public boolean playerJoinGame(String playerName) {
+    public boolean switchTeam(String playerName, EnumTeam newTeam) {
+        COKPlayer player = this.getPlayer(playerName);
+        if (player != null && this.gameManager.removeFromPlayerList(player)) {
+            this.teamData.get(player.getTeam()).removePlayer(player);
+            this.teamData.get(newTeam).addPlayer(player);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean playerJoinGame(String playerName, EnumTeam team) {
         COKPlayer player = new COKPlayer(playerName, this);
         if (this.gameManager.addToPlayerList(player)) {
             this.playerList.put(player.getPlayerName(), player);
+            this.teamData.get(team).addPlayer(player);
             return true;
         }
         return false;
@@ -45,6 +68,7 @@ public class COKGame {
     public boolean playerQuitGame(String playerName) {
         COKPlayer player = this.getPlayer(playerName);
         if (player != null && this.gameManager.removeFromPlayerList(player)) {
+            this.teamData.get(player.getTeam()).removePlayer(player);
             this.playerList.remove(player.getPlayerName());
             return true;
         }

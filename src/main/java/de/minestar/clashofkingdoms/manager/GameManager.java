@@ -27,6 +27,14 @@ public class GameManager {
         return this.gameList.get(gameName.toLowerCase());
     }
 
+    public COKGame getGameByPlayer(String playerName) {
+        COKPlayer player = this.getPlayer(playerName);
+        if (player != null) {
+            return player.getGame();
+        }
+        return null;
+    }
+
     public boolean gameExists(String gameName) {
         return (this.getGame(gameName) != null);
     }

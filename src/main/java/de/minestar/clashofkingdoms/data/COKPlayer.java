@@ -12,17 +12,34 @@ public class COKPlayer {
     private final Player bukkitPlayer;
     private final String playerName;
     private final COKGame game;
+    private EnumTeam team = EnumTeam.NONE;
+    private boolean isPunished;
 
     public COKPlayer(String playerName, COKGame game) {
         this.bukkitPlayer = Bukkit.getPlayerExact(playerName);
         this.playerName = playerName;
         this.game = game;
+        this.isPunished = false;
 
         Validate.notNull(this.bukkitPlayer);
         if (!this.bukkitPlayer.isOnline()) {
             throw new RuntimeException(COKCore.FULLNAME + "Trying to create COKPlayer '" + playerName + "', but the player is not online!");
         }
     }
+
+    public void sendMessage(String message) {
+        this.bukkitPlayer.sendMessage(message);
+    }
+
+    public void sendMessage(ChatColor color, String message) {
+        this.bukkitPlayer.sendMessage(color + message);
+    }
+
+    // ///////////////////////////////////////////////////////////////
+    //
+    // Getter and setter
+    //
+    // ///////////////////////////////////////////////////////////////
 
     public String getPlayerName() {
         return playerName;
@@ -32,11 +49,23 @@ public class COKPlayer {
         return game;
     }
 
-    public void sendMessage(String message) {
-        this.bukkitPlayer.sendMessage(message);
+    public EnumTeam getTeam() {
+        return team;
     }
 
-    public void sendMessage(ChatColor color, String message) {
-        this.bukkitPlayer.sendMessage(color + message);
+    public void setTeam(EnumTeam team) {
+        this.team = team;
+    }
+
+    public boolean isInTeam(EnumTeam otherTeam) {
+        return this.getTeam().equals(otherTeam);
+    }
+
+    public boolean isPunished() {
+        return isPunished;
+    }
+
+    public void setPunished(boolean isPunished) {
+        this.isPunished = isPunished;
     }
 }
