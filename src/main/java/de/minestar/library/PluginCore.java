@@ -112,6 +112,7 @@ public class PluginCore extends JavaPlugin {
 
         ConsoleUtils.printInfo(tempName, "Enabled v" + getDescription().getVersion() + " !");
     }
+
     /**
      * Loading configuration files or creating default ones
      * 
