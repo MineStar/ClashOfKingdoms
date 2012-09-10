@@ -1,9 +1,9 @@
 package de.minestar.clashofkingdoms;
 
 import de.minestar.clashofkingdoms.manager.GameManager;
-import de.minestar.minestarlibrary.AbstractCore;
+import de.minestar.library.PluginCore;
 
-public class COKCore extends AbstractCore {
+public class COKCore extends PluginCore {
 
     public static final String NAME = "Clash of Kingdoms";
     public static final String FULLNAME = "[" + NAME + "]";
@@ -19,4 +19,11 @@ public class COKCore extends AbstractCore {
         gameManager = new GameManager();
         return super.createManager();
     }
+
+    @Override
+    protected boolean createCommands() {
+        // TODO Auto-generated method stub
+        return super.createCommands();
+    }
+
 }
