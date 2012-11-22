@@ -23,7 +23,9 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 import com.bukkit.gemo.utils.BlockUtils;
 
@@ -194,6 +196,32 @@ public class GameListener implements Listener {
             event.setTo(event.getFrom().clone());
             return;
         }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+
+        // is the player in a game?
+        if (!this.gameManager.isPlayerInAnyGame(player.getName())) {
+            return;
+        }
+
+        COKGame game = this.gameManager.getGameByPlayer(player.getName());
+        game.onPlayerDisconnect(player.getName());
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        Player player = event.getEntity().getPlayer();
+
+        // is the player in a game?
+        if (!this.gameManager.isPlayerInAnyGame(player.getName())) {
+            return;
+        }
+
+        COKGame game = this.gameManager.getGameByPlayer(player.getName());
+        game.onPlayerDeath(player.getName());
     }
 
     private void checkForWinner(COKGame game, EnumTeam team) {

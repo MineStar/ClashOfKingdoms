@@ -36,6 +36,14 @@ public class COKPlayer {
         this.bukkitPlayer.sendMessage(color + message);
     }
 
+    public void clearInventory() {
+        this.bukkitPlayer.getInventory().clear();
+        this.bukkitPlayer.getInventory().setHelmet(null);
+        this.bukkitPlayer.getInventory().setChestplate(null);
+        this.bukkitPlayer.getInventory().setLeggings(null);
+        this.bukkitPlayer.getInventory().setBoots(null);
+    }
+
     // ///////////////////////////////////////////////////////////////
     //
     // Getter and setter
