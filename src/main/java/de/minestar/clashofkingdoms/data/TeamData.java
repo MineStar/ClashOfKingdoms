@@ -77,6 +77,10 @@ public class TeamData {
         return team;
     }
 
+    public int getPlayerCount() {
+        return this.playerList.size();
+    }
+
     public void resetBase(int baseHeight) {
         Block block = null;
         for (BaseBlock baseBlock : this.blockBase.getBaseBlocks()) {

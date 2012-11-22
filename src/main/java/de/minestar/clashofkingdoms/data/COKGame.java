@@ -15,6 +15,9 @@ public class COKGame {
     private static final String GAME_JOIN = "'%s' has joined the game!";
     private static final String GAME_QUIT = "'%s' has left the game!";
     private static final String TEAM_SWITCH = "'%s' is now in Team %s!";
+    private static final String TEAM_TOO_FEW = "Team %s has too few players!";
+
+    private static final int MIN_PLAYERS_PER_TEAM = 1;
 
     private GameManager gameManager;
 
@@ -80,10 +83,11 @@ public class COKGame {
 
     public void onPlayerDisconnect(String playerName) {
         this.playerQuitGame(playerName);
+        // TODO: interact with classes
     }
 
     public void onPlayerDeath(String playerName) {
-
+        // TODO: interact with classes
     }
 
     public boolean playerJoinGame(String playerName, EnumTeam team) {
@@ -105,6 +109,10 @@ public class COKGame {
             this.teamData.get(player.getTeam()).removePlayer(player);
             this.playerList.remove(player.getPlayerName());
             this.sendMessageToAll(ChatColor.GRAY, String.format(GAME_QUIT, playerName));
+            if (this.teamData.get(player.getTeam()).getPlayerCount() < MIN_PLAYERS_PER_TEAM) {
+                this.sendMessageToAll(ChatColor.RED, String.format(TEAM_TOO_FEW, player.getTeam().name()));
+                this.pauseGame();
+            }
             return true;
         }
         return false;
@@ -136,6 +144,19 @@ public class COKGame {
      * Start the game
      */
     public void startGame() {
+
+        // CHECK PLAYERCOUNT
+        if (this.teamData.get(EnumTeam.RED).getPlayerCount() < MIN_PLAYERS_PER_TEAM) {
+            this.sendMessageToAll(ChatColor.RED, String.format(TEAM_TOO_FEW, EnumTeam.RED.name()));
+            return;
+        }
+
+        // CHECK PLAYERCOUNT
+        if (this.teamData.get(EnumTeam.BLU).getPlayerCount() < MIN_PLAYERS_PER_TEAM) {
+            this.sendMessageToAll(ChatColor.RED, String.format(TEAM_TOO_FEW, EnumTeam.BLU.name()));
+            return;
+        }
+
         this.resetGame();
         this.setGameState(GameState.RUNNING);
         this.sendMessageToAll(ChatColor.GREEN, "The game has started!");
@@ -166,6 +187,7 @@ public class COKGame {
      */
     public void pauseGame() {
         this.setGameState(GameState.PAUSED);
+        this.sendMessageToAll(ChatColor.RED, "The game is now paused!");
     }
 
     /**
@@ -173,6 +195,7 @@ public class COKGame {
      */
     public void unpauseGame() {
         this.setGameState(GameState.RUNNING);
+        this.sendMessageToAll(ChatColor.GREEN, "The game is no longer paused!");
     }
 
     /**
