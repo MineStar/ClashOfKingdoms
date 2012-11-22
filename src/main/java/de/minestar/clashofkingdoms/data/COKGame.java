@@ -82,8 +82,9 @@ public class COKGame {
     }
 
     public void onPlayerDisconnect(String playerName) {
-        this.playerQuitGame(playerName);
         // TODO: interact with classes
+
+        this.playerQuitGame(playerName);
     }
 
     public void onPlayerDeath(String playerName) {

@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import de.minestar.clashofkingdoms.COKCore;
+import de.minestar.clashofkingdoms.classes.PlayerClass;
 import de.minestar.clashofkingdoms.enums.EnumTeam;
 
 public class COKPlayer {
@@ -15,6 +16,8 @@ public class COKPlayer {
     private final COKGame game;
     private EnumTeam team = EnumTeam.NONE;
     private boolean isPunished;
+
+    private PlayerClass playerClass = null;
 
     public COKPlayer(String playerName, COKGame game) {
         this.bukkitPlayer = Bukkit.getPlayerExact(playerName);
