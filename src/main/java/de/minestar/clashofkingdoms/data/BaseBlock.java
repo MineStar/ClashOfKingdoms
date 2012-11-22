@@ -21,4 +21,8 @@ public class BaseBlock {
         return (vector.getY() >= this.vector.getY() && vector.getY() <= this.vector.getY() + HEIGHT);
     }
 
+    public BlockVector getVector() {
+        return vector;
+    }
+
 }

@@ -1,5 +1,6 @@
 package de.minestar.clashofkingdoms.manager;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 import org.apache.commons.lang.Validate;
@@ -92,5 +93,9 @@ public class GameManager {
         }
         this.playerList.remove(player.getPlayerName());
         return true;
+    }
+
+    public Collection<COKGame> getAllGames() {
+        return this.gameList.values();
     }
 }

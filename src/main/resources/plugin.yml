@@ -2,3 +2,7 @@ name: Clash of Kingdoms
 main: de.minestar.clashofkingdoms.COKCore
 version: ${pom.version}
 depend: [MineStarLibrary]
+commands:
+    cok:
+        description: CoK related commands.
+        usage: /<command> <cmd 1> ... <cmd n>

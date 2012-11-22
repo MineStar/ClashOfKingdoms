@@ -3,6 +3,8 @@ package de.minestar.clashofkingdoms.data;
 import java.util.HashMap;
 
 import org.apache.commons.lang.Validate;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 
 import de.minestar.clashofkingdoms.enums.EnumTeam;
 import de.minestar.clashofkingdoms.utils.BlockVector;
@@ -30,24 +32,33 @@ public class TeamData {
         this.playerList.remove(player.getPlayerName());
     }
 
-    public int getBaseHeight() {
-        return this.blockBase.getHeight();
-    }
-
-    public void setBaseHeight(int height) {
-        this.blockBase.setHeight(height);
+    public boolean isBaseComplete(int baseHeight, int baseTypeID, byte baseSubID) {
+        Block block = null;
+        for (BaseBlock baseBlock : this.blockBase.getBaseBlocks()) {
+            for (int difY = 1; difY <= baseHeight; difY++) {
+                block = baseBlock.getVector().getRelative(0, difY, 0).getLocation().getBlock();
+                if (block.getType().equals(Material.AIR)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public int getBaseBlockCount() {
         return this.blockBase.getBlockCount();
     }
 
-    public boolean isBaseBlock(BlockVector vector) {
-        return this.blockBase.isBase(vector);
+    public boolean isBaseBlock(BlockVector vector, int baseHeight) {
+        return this.blockBase.isBase(vector, baseHeight);
     }
 
-    public boolean registerBaseBlock(BlockVector vector) {
-        return this.blockBase.registerBaseBlock(vector);
+    public boolean isRealBaseBlock(BlockVector vector) {
+        return this.blockBase.isRealBaseBlock(vector);
+    }
+
+    public boolean registerBaseBlock(BlockVector vector, int baseHeight) {
+        return this.blockBase.registerBaseBlock(vector, baseHeight);
     }
 
     public boolean unregisterBaseBlock(BlockVector vector) {
@@ -64,5 +75,19 @@ public class TeamData {
 
     public EnumTeam getTeam() {
         return team;
+    }
+
+    public void resetBase(int baseHeight) {
+        Block block = null;
+        for (BaseBlock baseBlock : this.blockBase.getBaseBlocks()) {
+            for (int difY = 0; difY <= baseHeight; difY++) {
+                block = baseBlock.getVector().getRelative(0, difY, 0).getLocation().getBlock();
+                if (difY > 0) {
+                    block.setType(Material.AIR);
+                } else {
+                    block.setTypeIdAndData(Material.WOOL.getId(), this.team.getSubID(), true);
+                }
+            }
+        }
     }
 }

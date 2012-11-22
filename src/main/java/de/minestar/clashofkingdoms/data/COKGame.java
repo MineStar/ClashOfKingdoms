@@ -8,14 +8,20 @@ import de.minestar.clashofkingdoms.COKCore;
 import de.minestar.clashofkingdoms.enums.EnumTeam;
 import de.minestar.clashofkingdoms.enums.GameState;
 import de.minestar.clashofkingdoms.manager.GameManager;
+import de.minestar.clashofkingdoms.utils.BlockVector;
 
 public class COKGame {
+
+    private static final String GAME_JOIN = "'%s' has joined the game!";
+    private static final String GAME_QUIT = "'%s' has left the game!";
+    private static final String TEAM_SWITCH = "'%s' is now in Team %s!";
 
     private GameManager gameManager;
 
     private final String gameName;
     private HashMap<String, COKPlayer> playerList;
     private GameState gameState = GameState.STOPPED;
+    private GameSettings settings;
 
     // TEAMDATA
     private HashMap<EnumTeam, TeamData> teamData;
@@ -27,10 +33,20 @@ public class COKGame {
 
         // TeamData
         this.teamData = new HashMap<EnumTeam, TeamData>();
-        this.teamData.put(EnumTeam.BLU, new TeamData(EnumTeam.BLU));
-        this.teamData.put(EnumTeam.RED, new TeamData(EnumTeam.RED));
-        this.teamData.put(EnumTeam.NONE, new TeamData(EnumTeam.NONE));
-        this.teamData.put(EnumTeam.REF, new TeamData(EnumTeam.REF));
+        this.addTeamData(EnumTeam.BLU);
+        this.addTeamData(EnumTeam.RED);
+        this.addTeamData(EnumTeam.NONE);
+        this.addTeamData(EnumTeam.REF);
+
+        // settings
+        this.settings = new GameSettings();
+    }
+
+    private void addTeamData(EnumTeam team) {
+        if (this.teamData.containsKey(team)) {
+            throw new RuntimeException("TeamData '" + team.name() + "' already exists!");
+        }
+        this.teamData.put(team, new TeamData(team));
     }
 
     // ///////////////////////////////////////////////////////////////
@@ -49,9 +65,11 @@ public class COKGame {
 
     public boolean switchTeam(String playerName, EnumTeam newTeam) {
         COKPlayer player = this.getPlayer(playerName);
-        if (player != null && this.gameManager.removeFromPlayerList(player)) {
+        if (player != null) {
             this.teamData.get(player.getTeam()).removePlayer(player);
             this.teamData.get(newTeam).addPlayer(player);
+            player.setTeam(newTeam);
+            this.sendMessageToAll(ChatColor.GRAY, String.format(TEAM_SWITCH, playerName, newTeam.name()));
             return true;
         }
         return false;
@@ -60,8 +78,10 @@ public class COKGame {
     public boolean playerJoinGame(String playerName, EnumTeam team) {
         COKPlayer player = new COKPlayer(playerName, this);
         if (this.gameManager.addToPlayerList(player)) {
+            player.setTeam(team);
             this.playerList.put(player.getPlayerName(), player);
             this.teamData.get(team).addPlayer(player);
+            this.sendMessageToAll(ChatColor.GRAY, String.format(GAME_JOIN, playerName));
             return true;
         }
         return false;
@@ -72,11 +92,11 @@ public class COKGame {
         if (player != null && this.gameManager.removeFromPlayerList(player)) {
             this.teamData.get(player.getTeam()).removePlayer(player);
             this.playerList.remove(player.getPlayerName());
+            this.sendMessageToAll(ChatColor.GRAY, String.format(GAME_QUIT, playerName));
             return true;
         }
         return false;
     }
-
     // ///////////////////////////////////////////////////////////////
     //
     // Messagerelated stuff
@@ -103,7 +123,9 @@ public class COKGame {
      * Start the game
      */
     public void startGame() {
+        this.resetGame();
         this.setGameState(GameState.RUNNING);
+        this.sendMessageToAll(ChatColor.GREEN, "The game has started!");
     }
 
     /**
@@ -111,6 +133,14 @@ public class COKGame {
      */
     public void stopGame() {
         this.setGameState(GameState.STOPPED);
+    }
+
+    /**
+     * Reset the game
+     */
+    private void resetGame() {
+        this.teamData.get(EnumTeam.RED).resetBase(this.settings.getBaseHeight());
+        this.teamData.get(EnumTeam.BLU).resetBase(this.settings.getBaseHeight());
     }
 
     /**
@@ -133,6 +163,14 @@ public class COKGame {
     public void closeGame() {
         this.stopGame();
         this.playerList.clear();
+    }
+
+    public boolean isBaseBlock(EnumTeam team, BlockVector vector) {
+        return this.teamData.get(team).isBaseBlock(vector, this.settings.getBaseHeight());
+    }
+
+    public boolean isBaseComplete(EnumTeam team) {
+        return this.teamData.get(team).isBaseComplete(this.settings.getBaseHeight(), this.settings.getBaseTypeID(), this.settings.getBaseSubID());
     }
 
     // ///////////////////////////////////////////////////////////////
@@ -163,5 +201,13 @@ public class COKGame {
 
     public boolean isPaused() {
         return this.gameState.equals(GameState.PAUSED);
+    }
+
+    public GameSettings getSettings() {
+        return settings;
+    }
+
+    public TeamData getTeamData(EnumTeam team) {
+        return this.teamData.get(team);
     }
 }

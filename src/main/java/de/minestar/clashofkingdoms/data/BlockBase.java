@@ -1,5 +1,6 @@
 package de.minestar.clashofkingdoms.data;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -7,24 +8,27 @@ import de.minestar.clashofkingdoms.utils.BlockVector;
 
 public class BlockBase {
 
-    private int height = 5;
     private HashMap<BlockVector, BaseBlock> baseBlocks;
 
     public BlockBase() {
         this.baseBlocks = new HashMap<BlockVector, BaseBlock>();
     }
 
-    public boolean isBase(BlockVector vector) {
+    public boolean isBase(BlockVector vector, int baseHeight) {
         for (Entry<BlockVector, BaseBlock> entry : this.baseBlocks.entrySet()) {
-            if (entry.getValue().isBase(vector, this.height)) {
+            if (entry.getValue().isBase(vector, baseHeight)) {
                 return true;
             }
         }
         return false;
     }
 
-    public boolean registerBaseBlock(BlockVector vector) {
-        if (this.baseBlocks.containsKey(vector) || this.isBase(vector)) {
+    public boolean isRealBaseBlock(BlockVector vector) {
+        return this.baseBlocks.containsKey(vector);
+    }
+
+    public boolean registerBaseBlock(BlockVector vector, int baseHeight) {
+        if (this.baseBlocks.containsKey(vector) || this.isBase(vector, baseHeight)) {
             return false;
         }
 
@@ -42,15 +46,12 @@ public class BlockBase {
         return true;
     }
 
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public int getHeight() {
-        return height;
+    public Collection<BaseBlock> getBaseBlocks() {
+        return this.baseBlocks.values();
     }
 
     public int getBlockCount() {
         return this.baseBlocks.size();
     }
+
 }

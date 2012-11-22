@@ -7,6 +7,5 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Execution {
-    public abstract boolean executeSuperCommand();
+public @interface ExecuteSuperCommand {
 }
