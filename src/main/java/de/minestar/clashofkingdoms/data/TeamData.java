@@ -3,6 +3,7 @@ package de.minestar.clashofkingdoms.data;
 import java.util.HashMap;
 
 import org.apache.commons.lang.Validate;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
@@ -12,7 +13,7 @@ import de.minestar.clashofkingdoms.utils.BlockVector;
 public class TeamData {
     private final EnumTeam team;
     private final BlockBase blockBase;
-    private BlockVector spawn = null;
+    private Location spawn = null;
 
     private HashMap<String, COKPlayer> playerList;
 
@@ -49,6 +50,10 @@ public class TeamData {
         return this.blockBase.getBlockCount();
     }
 
+    public BlockBase getBlockBase() {
+        return blockBase;
+    }
+
     public boolean isBaseBlock(BlockVector vector, int baseHeight) {
         return this.blockBase.isBase(vector, baseHeight);
     }
@@ -65,11 +70,11 @@ public class TeamData {
         return this.blockBase.unregisterBaseBlock(vector);
     }
 
-    public void setSpawn(BlockVector spawn) {
+    public void setSpawn(Location spawn) {
         this.spawn = spawn;
     }
 
-    public BlockVector getSpawn() {
+    public Location getSpawn() {
         return spawn;
     }
 

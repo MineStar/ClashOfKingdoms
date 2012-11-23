@@ -15,7 +15,6 @@ public class COKPlayer {
     private final String playerName;
     private final COKGame game;
     private EnumTeam team = EnumTeam.NONE;
-    private boolean isPunished;
 
     private PlayerClass playerClass = null;
 
@@ -23,7 +22,6 @@ public class COKPlayer {
         this.bukkitPlayer = Bukkit.getPlayerExact(playerName);
         this.playerName = playerName;
         this.game = game;
-        this.isPunished = false;
 
         Validate.notNull(this.bukkitPlayer);
         if (!this.bukkitPlayer.isOnline()) {
@@ -71,13 +69,5 @@ public class COKPlayer {
 
     public boolean isInTeam(EnumTeam otherTeam) {
         return this.getTeam().equals(otherTeam);
-    }
-
-    public boolean isPunished() {
-        return isPunished;
-    }
-
-    public void setPunished(boolean isPunished) {
-        this.isPunished = isPunished;
     }
 }

@@ -10,6 +10,8 @@ import de.minestar.library.PluginCore;
 
 public class COKCore extends PluginCore {
 
+    public static COKCore INSTANCE;
+
     public static final String NAME = "Clash of Kingdoms";
     public static final String FULLNAME = "[" + NAME + "]";
 
@@ -19,6 +21,7 @@ public class COKCore extends PluginCore {
 
     public COKCore() {
         super(NAME);
+        COKCore.INSTANCE = this;
     }
 
     @Override

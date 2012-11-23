@@ -245,11 +245,19 @@ public class COKGame {
         return this.gameState.equals(GameState.PAUSED);
     }
 
+    public void setSettings(GameSettings settings) {
+        this.settings = settings;
+    }
+
     public GameSettings getSettings() {
         return settings;
     }
 
     public TeamData getTeamData(EnumTeam team) {
         return this.teamData.get(team);
+    }
+
+    public HashMap<EnumTeam, TeamData> getAllTeamData() {
+        return this.teamData;
     }
 }

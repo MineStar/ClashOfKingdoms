@@ -14,10 +14,15 @@ public class COKCommand extends AbstractCommand {
 
     @Override
     protected void createSubCommands() {
+        // players
         this.registerCommand(new CreateGameCommand());
         this.registerCommand(new StartGameCommand());
         this.registerCommand(new JoinGameCommand());
         this.registerCommand(new JoinTeamCommand());
         this.registerCommand(new QuitGameCommand());
+
+        // settings
+        this.registerCommand(new CreateSettingsCommand());
+        this.registerCommand(new LoadSettingsCommand());
     }
 }
