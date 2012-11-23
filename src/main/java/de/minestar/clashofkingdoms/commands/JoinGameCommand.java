@@ -14,7 +14,7 @@ import de.minestar.library.commandsystem.annotations.PermissionNode;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
 
 @Label(label = "join")
-@Arguments(arguments = "<GAMENAME> RED|BLU|REF|NONE")
+@Arguments(arguments = "<GAMENAME> [RED|BLU|REF|SPEC]")
 @PermissionNode(node = "cok.commands.join")
 @Description(description = "Join a game")
 public class JoinGameCommand extends AbstractCommand {
@@ -32,7 +32,10 @@ public class JoinGameCommand extends AbstractCommand {
             return;
         }
 
-        EnumTeam team = EnumTeam.byString(argumentList.getString(1));
+        EnumTeam team = null;
+        if (argumentList.length() > 1) {
+            team = EnumTeam.byString(argumentList.getString(1));
+        }
         game.playerJoinGame(player.getName(), team);
     }
 }

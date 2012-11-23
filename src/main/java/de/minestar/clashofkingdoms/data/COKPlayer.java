@@ -14,7 +14,7 @@ public class COKPlayer {
     private final Player bukkitPlayer;
     private final String playerName;
     private final COKGame game;
-    private EnumTeam team = EnumTeam.NONE;
+    private EnumTeam team = EnumTeam.SPEC;
 
     private PlayerClass playerClass = null;
 
@@ -65,6 +65,11 @@ public class COKPlayer {
 
     public void setTeam(EnumTeam team) {
         this.team = team;
+        if (team.equals(EnumTeam.SPEC)) {
+            game.hidePlayer(this);
+        } else {
+            game.showPlayer(this);
+        }
     }
 
     public Player getBukkitPlayer() {
@@ -73,5 +78,14 @@ public class COKPlayer {
 
     public boolean isInTeam(EnumTeam otherTeam) {
         return this.getTeam().equals(otherTeam);
+    }
+
+    public PlayerClass getPlayerClass() {
+        return playerClass;
+    }
+
+    public void setPlayerClass(PlayerClass playerClass) {
+        this.playerClass = playerClass;
+        this.game.updatePlayerClass(playerClass, this);
     }
 }

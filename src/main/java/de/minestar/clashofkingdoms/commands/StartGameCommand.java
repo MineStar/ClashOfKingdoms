@@ -15,7 +15,7 @@ import de.minestar.minestarlibrary.utils.PlayerUtils;
 
 @Label(label = "start")
 @Arguments(arguments = "")
-@PermissionNode(node = "cok.commands.game")
+@PermissionNode(node = "cok.commands.start")
 @Description(description = "Start the game")
 public class StartGameCommand extends AbstractCommand {
 

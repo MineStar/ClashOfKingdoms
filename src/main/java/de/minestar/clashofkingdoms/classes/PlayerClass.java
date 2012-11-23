@@ -38,6 +38,7 @@ public abstract class PlayerClass {
             file.delete();
         } else {
             this.saveDefaultConfig(file);
+            return;
         }
 
         try {
@@ -162,6 +163,7 @@ public abstract class PlayerClass {
             return null;
         }
     }
+
     protected static ItemStack ItemStackFromString(String text) {
         try {
             String[] split = text.split("-");

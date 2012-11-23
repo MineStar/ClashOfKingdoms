@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 public class KnightClass extends PlayerClass {
 
     public KnightClass() {
-        super(EnumPlayerClass.KNIGHT.getTypeName(), 0.5);
+        super(EnumPlayerClass.KNIGHT.getClassName(), 0.5);
     }
 
     @Override

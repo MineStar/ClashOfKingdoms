@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 public class ArcherClass extends PlayerClass {
 
     public ArcherClass() {
-        super(EnumPlayerClass.ARCHER.getTypeName(), 0.2);
+        super(EnumPlayerClass.ARCHER.getClassName(), 0.2);
     }
 
     @Override

@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
+import de.minestar.clashofkingdoms.classes.EnumPlayerClass;
 import de.minestar.clashofkingdoms.enums.EnumTeam;
 import de.minestar.clashofkingdoms.utils.BlockVector;
 
@@ -16,11 +17,25 @@ public class TeamData {
     private Location spawn = null;
 
     private HashMap<String, COKPlayer> playerList;
+    private HashMap<EnumPlayerClass, COKPlayer> currentClasses;
 
     public TeamData(EnumTeam team) {
         this.team = team;
         this.blockBase = new BlockBase();
         this.playerList = new HashMap<String, COKPlayer>();
+        this.currentClasses = new HashMap<EnumPlayerClass, COKPlayer>();
+    }
+
+    public void setCurrentClass(EnumPlayerClass enumPlayerClass, COKPlayer player) {
+        if (player == null) {
+            this.currentClasses.remove(enumPlayerClass);
+        } else {
+            this.currentClasses.put(enumPlayerClass, player);
+        }
+    }
+
+    public COKPlayer getCurrentClass(EnumPlayerClass enumPlayerClass) {
+        return this.currentClasses.get(enumPlayerClass);
     }
 
     public void addPlayer(COKPlayer player) {
@@ -86,6 +101,10 @@ public class TeamData {
         return this.playerList.size();
     }
 
+    public HashMap<String, COKPlayer> getPlayerList() {
+        return playerList;
+    }
+
     public void resetBase(int baseHeight) {
         Block block = null;
         for (BaseBlock baseBlock : this.blockBase.getBaseBlocks()) {
@@ -98,5 +117,9 @@ public class TeamData {
                 }
             }
         }
+    }
+
+    public void addBlocks(int punishBlocks, COKGame game) {
+        this.blockBase.addBlocks(punishBlocks, game, this.getTeam());
     }
 }

@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import de.minestar.clashofkingdoms.enums.EnumTeam;
 import de.minestar.clashofkingdoms.utils.BlockVector;
 
 public class BlockBase {
@@ -54,4 +55,20 @@ public class BlockBase {
         return this.baseBlocks.size();
     }
 
+    public void addBlocks(int punishBlocks, COKGame game, EnumTeam team) {
+        for (BaseBlock block : this.baseBlocks.values()) {
+            if (punishBlocks > 0) {
+                if (block.addBlock(game)) {
+                    if (game.checkForWinner(team)) {
+                        return;
+                    }
+                    punishBlocks--;
+                }
+            }
+        }
+        if (punishBlocks > 0) {
+            this.addBlocks(punishBlocks, game, team);
+        }
+        game.checkForWinner(team);
+    }
 }

@@ -14,7 +14,7 @@ import de.minestar.library.commandsystem.annotations.PermissionNode;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
 
 @Label(label = "team")
-@Arguments(arguments = "RED|BLU|REF|NONE")
+@Arguments(arguments = "RED|BLU|REF|SPEC")
 @PermissionNode(node = "cok.commands.team")
 @Description(description = "Join a game")
 public class JoinTeamCommand extends AbstractCommand {

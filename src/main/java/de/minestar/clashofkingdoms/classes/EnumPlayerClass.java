@@ -10,16 +10,16 @@ public enum EnumPlayerClass {
 
     REFEREE("Referee", RefereeClass.class);
 
-    private final String typeName;
+    private final String className;
     private final Class<? extends PlayerClass> clazz;
 
-    private EnumPlayerClass(String typeName, Class<? extends PlayerClass> clazz) {
-        this.typeName = typeName;
+    private EnumPlayerClass(String className, Class<? extends PlayerClass> clazz) {
+        this.className = className;
         this.clazz = clazz;
     }
 
-    public String getTypeName() {
-        return typeName;
+    public String getClassName() {
+        return className;
     }
 
     public Class<? extends PlayerClass> getClazz() {
@@ -28,7 +28,7 @@ public enum EnumPlayerClass {
 
     public static EnumPlayerClass byType(String text) {
         for (EnumPlayerClass type : EnumPlayerClass.values()) {
-            if (type.getTypeName().equalsIgnoreCase(text)) {
+            if (type.getClassName().equalsIgnoreCase(text)) {
                 return type;
             }
         }

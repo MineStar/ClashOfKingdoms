@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 public class LeaderClass extends PlayerClass {
 
     public LeaderClass() {
-        super(EnumPlayerClass.LEADER.getTypeName(), 1.0);
+        super(EnumPlayerClass.LEADER.getClassName(), 1.0);
     }
 
     @Override

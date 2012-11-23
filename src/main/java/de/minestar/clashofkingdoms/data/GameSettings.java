@@ -132,11 +132,24 @@ public class GameSettings {
         this.playerClassList.clear();
 
         for (EnumPlayerClass clazz : EnumPlayerClass.values()) {
-            PlayerClass instance = PlayerClass.loadFromSettings(new File(thisGameDir, clazz.getTypeName() + ".cls"));
+            PlayerClass instance = PlayerClass.loadFromSettings(new File(thisGameDir, clazz.getClassName() + ".cls"));
             if (instance == null) {
                 continue;
             }
             this.playerClassList.add(instance);
         }
+    }
+
+    public PlayerClass getPlayerClass(String name) {
+        for (PlayerClass clazz : this.playerClassList) {
+            if (clazz.getClassName().equalsIgnoreCase(name)) {
+                return clazz;
+            }
+        }
+        return null;
+    }
+
+    public ArrayList<PlayerClass> getPlayerClassList() {
+        return playerClassList;
     }
 }

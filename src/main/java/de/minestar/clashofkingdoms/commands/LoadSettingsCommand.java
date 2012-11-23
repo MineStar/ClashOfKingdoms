@@ -46,7 +46,7 @@ public class LoadSettingsCommand extends AbstractCommand {
         File file = new File(thisGameDir, settingsName + ".dat");
 
         if (!file.exists()) {
-            PlayerUtils.sendError(player, COKCore.NAME, "Settings  '" + settingsName + "' do not exist!");
+            PlayerUtils.sendError(player, COKCore.NAME, "Settings '" + settingsName + "' do not exist!");
             return;
         }
         game.getSettings().loadConfig(settingsName, game.getAllTeamData());

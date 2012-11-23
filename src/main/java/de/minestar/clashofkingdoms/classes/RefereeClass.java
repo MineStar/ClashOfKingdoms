@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack;
 public class RefereeClass extends PlayerClass {
 
     public RefereeClass() {
-        super(EnumPlayerClass.REFEREE.getTypeName(), 0.0);
+        super(EnumPlayerClass.REFEREE.getClassName(), 0.0);
     }
 
     @Override

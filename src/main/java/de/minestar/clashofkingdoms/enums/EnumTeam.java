@@ -3,7 +3,7 @@ package de.minestar.clashofkingdoms.enums;
 import org.bukkit.ChatColor;
 
 public enum EnumTeam {
-    NONE("NONE", (byte) 0, ChatColor.GRAY),
+    SPEC("SPEC", (byte) 0, ChatColor.GRAY),
 
     RED("RED", (byte) 14, ChatColor.RED),
 
@@ -39,6 +39,6 @@ public enum EnumTeam {
                 return team;
             }
         }
-        return EnumTeam.NONE;
+        return EnumTeam.SPEC;
     }
 }

@@ -1,10 +1,15 @@
 package de.minestar.clashofkingdoms.data;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 
 import de.minestar.clashofkingdoms.COKCore;
+import de.minestar.clashofkingdoms.classes.EnumPlayerClass;
+import de.minestar.clashofkingdoms.classes.PlayerClass;
 import de.minestar.clashofkingdoms.enums.EnumTeam;
 import de.minestar.clashofkingdoms.enums.GameState;
 import de.minestar.clashofkingdoms.manager.GameManager;
@@ -12,10 +17,13 @@ import de.minestar.clashofkingdoms.utils.BlockVector;
 
 public class COKGame {
 
-    private static final String GAME_JOIN = "'%s' has joined the game!";
+    private static final String GAME_JOIN = "'%s' has joined the game ( %s ) !";
     private static final String GAME_QUIT = "'%s' has left the game!";
     private static final String TEAM_SWITCH = "'%s' is now in %s!";
     private static final String TEAM_TOO_FEW = "%s has too few players!";
+    private static final String PLAYER_CLASS_NEW = "'%s' is the new %s of %s!";
+    private static final String PLAYER_CLASS_KILL = "'The %s of %s has been killed!";
+    private static final String GAME_WIN = ChatColor.GOLD + "[COK] %s has won the game!";
 
     private static final int MIN_PLAYERS_PER_TEAM = 1;
 
@@ -38,7 +46,7 @@ public class COKGame {
         this.teamData = new HashMap<EnumTeam, TeamData>();
         this.addTeamData(EnumTeam.BLU);
         this.addTeamData(EnumTeam.RED);
-        this.addTeamData(EnumTeam.NONE);
+        this.addTeamData(EnumTeam.SPEC);
         this.addTeamData(EnumTeam.REF);
 
         // settings
@@ -77,14 +85,14 @@ public class COKGame {
             }
 
             if (this.isStopped() && !newTeam.equals(EnumTeam.REF)) {
-                if (this.teamData.get(EnumTeam.NONE).getSpawn() != null) {
-                    player.getBukkitPlayer().teleport(this.teamData.get(EnumTeam.NONE).getSpawn());
+                if (this.teamData.get(EnumTeam.SPEC).getSpawn() != null) {
+                    player.getBukkitPlayer().teleport(this.teamData.get(EnumTeam.SPEC).getSpawn());
                 }
             } else {
                 if (this.teamData.get(newTeam).getSpawn() != null) {
                     player.getBukkitPlayer().teleport(this.teamData.get(newTeam).getSpawn());
-                } else if (this.teamData.get(EnumTeam.NONE).getSpawn() != null) {
-                    player.getBukkitPlayer().teleport(this.teamData.get(EnumTeam.NONE).getSpawn());
+                } else if (this.teamData.get(EnumTeam.SPEC).getSpawn() != null) {
+                    player.getBukkitPlayer().teleport(this.teamData.get(EnumTeam.SPEC).getSpawn());
                 }
             }
 
@@ -95,32 +103,71 @@ public class COKGame {
     }
 
     public void onPlayerDisconnect(String playerName) {
-        // TODO: interact with classes
-
         this.playerQuitGame(playerName);
     }
 
     public void onPlayerDeath(String playerName) {
-        // TODO: interact with classes
+        // interact with classes
+        COKPlayer player = this.getPlayer(playerName);
+        if (player.getPlayerClass() != null && (player.isInTeam(EnumTeam.RED) || player.isInTeam(EnumTeam.BLU))) {
+            String oldClass = player.getPlayerClass().getClassName();
+            int punishBlocks = (int) (this.getTeamData(player.getTeam()).getBaseBlockCount() * player.getPlayerClass().getPunishMultiplicator());
+            this.punish(punishBlocks, player.getTeam(), false);
+            this.sendMessageToAll(ChatColor.WHITE, String.format(PLAYER_CLASS_KILL, this.settings.getPlayerClass(oldClass).getClassName(), player.getTeam().getFullTeamName(ChatColor.WHITE)));
+            this.getRandomizedPlayerClass(player.getTeam(), this.settings.getPlayerClass(oldClass));
+            player.setPlayerClass(null);
+        }
+    }
+
+    public void getRandomizedPlayerClass(EnumTeam team, PlayerClass playerClass) {
+        // get free players
+        ArrayList<COKPlayer> freePlayers = new ArrayList<COKPlayer>();
+        for (COKPlayer player : this.getTeamData(team).getPlayerList().values()) {
+            if (player.getPlayerClass() == null && player.getBukkitPlayer().isOnline() && !player.getBukkitPlayer().isDead()) {
+                freePlayers.add(player);
+            }
+        }
+
+        // find a randomized player
+        if (freePlayers.size() > 0) {
+            Random random = new Random();
+            int index = random.nextInt(freePlayers.size());
+            COKPlayer player = freePlayers.get(index);
+            player.setPlayerClass(playerClass);
+            playerClass.giveItems(player.getBukkitPlayer());
+            this.sendMessageToAll(ChatColor.GRAY, String.format(PLAYER_CLASS_NEW, player.getPlayerName(), playerClass.getClassName(), team.getFullTeamName(ChatColor.GRAY)));
+        }
     }
 
     public boolean playerJoinGame(String playerName, EnumTeam team) {
         COKPlayer player = new COKPlayer(playerName, this);
+
+        // handle automatic balance
+        if (team == null) {
+            int redTeamSize = this.getTeamData(EnumTeam.RED).getPlayerCount();
+            int bluTeamSize = this.getTeamData(EnumTeam.BLU).getPlayerCount();
+            if (redTeamSize <= bluTeamSize) {
+                team = EnumTeam.RED;
+            } else {
+                team = EnumTeam.BLU;
+            }
+        }
+
         if (this.gameManager.addToPlayerList(player)) {
             player.setTeam(team);
             this.playerList.put(player.getPlayerName(), player);
             this.teamData.get(team).addPlayer(player);
-            this.sendMessageToAll(ChatColor.GRAY, String.format(GAME_JOIN, playerName));
+            this.sendMessageToAll(ChatColor.GRAY, String.format(GAME_JOIN, playerName, team.getFullTeamName(ChatColor.GRAY)));
 
             if (this.isStopped() && !team.equals(EnumTeam.REF)) {
-                if (this.teamData.get(EnumTeam.NONE).getSpawn() != null) {
-                    player.getBukkitPlayer().teleport(this.teamData.get(EnumTeam.NONE).getSpawn());
+                if (this.teamData.get(EnumTeam.SPEC).getSpawn() != null) {
+                    player.getBukkitPlayer().teleport(this.teamData.get(EnumTeam.SPEC).getSpawn());
                 }
             } else {
                 if (this.teamData.get(team).getSpawn() != null) {
                     player.getBukkitPlayer().teleport(this.teamData.get(team).getSpawn());
-                } else if (this.teamData.get(EnumTeam.NONE).getSpawn() != null) {
-                    player.getBukkitPlayer().teleport(this.teamData.get(EnumTeam.NONE).getSpawn());
+                } else if (this.teamData.get(EnumTeam.SPEC).getSpawn() != null) {
+                    player.getBukkitPlayer().teleport(this.teamData.get(EnumTeam.SPEC).getSpawn());
                 }
             }
             return true;
@@ -131,20 +178,50 @@ public class COKGame {
     public boolean playerQuitGame(String playerName) {
         COKPlayer player = this.getPlayer(playerName);
         if (player != null && this.gameManager.removeFromPlayerList(player)) {
-            // teleport to none spawn
-            if (this.teamData.get(EnumTeam.NONE).getSpawn() != null) {
-                player.getBukkitPlayer().teleport(this.teamData.get(EnumTeam.NONE).getSpawn());
+            // teleport to SPEC spawn
+            if (this.teamData.get(EnumTeam.SPEC).getSpawn() != null) {
+                player.getBukkitPlayer().teleport(this.teamData.get(EnumTeam.SPEC).getSpawn());
             }
 
+            // interact with classes
+            if (player.getPlayerClass() != null && (player.isInTeam(EnumTeam.RED) || player.isInTeam(EnumTeam.BLU))) {
+                String oldClass = player.getPlayerClass().getClassName();
+                int punishBlocks = (int) (this.getTeamData(player.getTeam()).getBaseBlockCount() * player.getPlayerClass().getPunishMultiplicator());
+                this.punish(punishBlocks, player.getTeam(), false);
+                this.getRandomizedPlayerClass(player.getTeam(), this.settings.getPlayerClass(oldClass));
+                player.setPlayerClass(null);
+            }
+
+            // clear inventory and remove the player
             player.clearInventory();
             this.teamData.get(player.getTeam()).removePlayer(player);
             this.playerList.remove(player.getPlayerName());
             this.sendMessageToAll(ChatColor.GRAY, String.format(GAME_QUIT, playerName));
+
+            // pause the game, if there are too few players
             if (this.teamData.get(player.getTeam()).getPlayerCount() < MIN_PLAYERS_PER_TEAM) {
                 this.sendMessageToAll(ChatColor.RED, String.format(TEAM_TOO_FEW, player.getTeam().getFullTeamName(ChatColor.RED)));
                 this.pauseGame();
             }
+
+            this.showPlayer(player);
+
             return true;
+        }
+        return false;
+    }
+
+    public boolean checkForWinner(EnumTeam team) {
+        if (this.isBaseComplete(team)) {
+            if (team.equals(EnumTeam.RED)) {
+                this.sendMessageToAll(String.format(GAME_WIN, EnumTeam.BLU.getFullTeamName(ChatColor.GOLD)));
+                this.endGame();
+                return true;
+            } else if (team.equals(EnumTeam.BLU)) {
+                this.sendMessageToAll(String.format(GAME_WIN, EnumTeam.RED.getFullTeamName(ChatColor.GOLD)));
+                this.endGame();
+                return true;
+            }
         }
         return false;
     }
@@ -176,19 +253,50 @@ public class COKGame {
      */
     public void startGame() {
 
-        // CHECK PLAYERCOUNT
-        if (this.teamData.get(EnumTeam.RED).getPlayerCount() < MIN_PLAYERS_PER_TEAM) {
-            this.sendMessageToAll(ChatColor.RED, String.format(TEAM_TOO_FEW, EnumTeam.RED.getFullTeamName(ChatColor.RED)));
-            return;
-        }
-
-        // CHECK PLAYERCOUNT
-        if (this.teamData.get(EnumTeam.BLU).getPlayerCount() < MIN_PLAYERS_PER_TEAM) {
-            this.sendMessageToAll(ChatColor.RED, String.format(TEAM_TOO_FEW, EnumTeam.BLU.getFullTeamName(ChatColor.RED)));
-            return;
-        }
+        // // CHECK PLAYERCOUNT
+        // if (this.teamData.get(EnumTeam.RED).getPlayerCount() < MIN_PLAYERS_PER_TEAM) {
+        // this.sendMessageToAll(ChatColor.RED, String.format(TEAM_TOO_FEW, EnumTeam.RED.getFullTeamName(ChatColor.RED)));
+        // return;
+        // }
+        //
+        // // CHECK PLAYERCOUNT
+        // if (this.teamData.get(EnumTeam.BLU).getPlayerCount() < MIN_PLAYERS_PER_TEAM) {
+        // this.sendMessageToAll(ChatColor.RED, String.format(TEAM_TOO_FEW, EnumTeam.BLU.getFullTeamName(ChatColor.RED)));
+        // return;
+        // }
 
         this.resetGame();
+
+        // tp all to spawn
+        for (COKPlayer player : this.playerList.values()) {
+            Location location = this.getTeamData(player.getTeam()).getSpawn();
+            if (location == null) {
+                continue;
+            }
+
+            player.getBukkitPlayer().teleport(location);
+        }
+
+        // get new classes
+        for (PlayerClass playerClass : this.settings.getPlayerClassList()) {
+            if (playerClass.getClassName().equalsIgnoreCase(EnumPlayerClass.REFEREE.getClassName())) {
+                continue;
+            }
+
+            if (!playerClass.isEnabled()) {
+                continue;
+            }
+
+            this.getRandomizedPlayerClass(EnumTeam.RED, playerClass);
+            this.getRandomizedPlayerClass(EnumTeam.BLU, playerClass);
+        }
+
+        // add items for referees
+        for (COKPlayer player : this.getTeamData(EnumTeam.REF).getPlayerList().values()) {
+            player.setPlayerClass(this.settings.getPlayerClass(EnumPlayerClass.REFEREE.getClassName()));
+            this.settings.getPlayerClass(EnumPlayerClass.REFEREE.getClassName()).giveItems(player.getBukkitPlayer());
+        }
+
         this.setGameState(GameState.RUNNING);
         this.sendMessageToAll(ChatColor.GREEN, "The game has started!");
     }
@@ -197,6 +305,15 @@ public class COKGame {
      * Stop the game
      */
     public void stopGame() {
+        this.sendMessageToAll(ChatColor.GREEN, "The game has been stopped by an Admin!");
+        this.setGameState(GameState.STOPPED);
+        this.resetGame();
+    }
+
+    /**
+     * End the game
+     */
+    public void endGame() {
         this.setGameState(GameState.STOPPED);
     }
 
@@ -209,6 +326,9 @@ public class COKGame {
         for (COKPlayer player : this.playerList.values()) {
             if (player.isInTeam(EnumTeam.RED) || player.isInTeam(EnumTeam.BLU)) {
                 player.clearInventory();
+                player.setPlayerClass(null);
+                player.getBukkitPlayer().setHealth(20);
+                player.getBukkitPlayer().setFoodLevel(20);
             }
         }
     }
@@ -289,5 +409,28 @@ public class COKGame {
 
     public HashMap<EnumTeam, TeamData> getAllTeamData() {
         return this.teamData;
+    }
+
+    public void punish(int amount, EnumTeam team, boolean showMessage) {
+        if (showMessage) {
+            this.sendMessageToAll(ChatColor.GOLD, team.getFullTeamName(ChatColor.GOLD) + " gets a punishment of " + amount + " blocks!");
+        }
+        this.getTeamData(team).addBlocks(amount, this);
+    }
+
+    public void hidePlayer(COKPlayer player) {
+        for (COKPlayer otherPlayer : this.getTeamData(EnumTeam.RED).getPlayerList().values()) {
+            otherPlayer.getBukkitPlayer().hidePlayer(player.getBukkitPlayer());
+        }
+    }
+
+    public void showPlayer(COKPlayer player) {
+        for (COKPlayer otherPlayer : this.getTeamData(EnumTeam.RED).getPlayerList().values()) {
+            otherPlayer.getBukkitPlayer().showPlayer(player.getBukkitPlayer());
+        }
+    }
+
+    public void updatePlayerClass(PlayerClass playerClass, COKPlayer player) {
+        this.getTeamData(player.getTeam()).setCurrentClass(EnumPlayerClass.byType(playerClass.getClassName()), player);
     }
 }

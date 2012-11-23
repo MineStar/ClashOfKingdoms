@@ -1,6 +1,5 @@
 package de.minestar.clashofkingdoms.commands;
 
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import de.minestar.clashofkingdoms.COKCore;
@@ -14,11 +13,11 @@ import de.minestar.library.commandsystem.annotations.Label;
 import de.minestar.library.commandsystem.annotations.PermissionNode;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
 
-@Label(label = "setspawn")
-@Arguments(arguments = "RED|BLU|REF|SPEC")
-@PermissionNode(node = "cok.commands.setspawn")
-@Description(description = "Set a spawn")
-public class SetSpawnCommand extends AbstractCommand {
+@Label(label = "punish")
+@Arguments(arguments = "RED|BLU <AMOUNT>")
+@PermissionNode(node = "cok.commands.punish")
+@Description(description = "Punish a team")
+public class PunishTeamCommand extends AbstractCommand {
 
     @Override
     public void execute(Player player, ArgumentList argumentList) {
@@ -33,14 +32,19 @@ public class SetSpawnCommand extends AbstractCommand {
             return;
         }
 
-        if (game.isRunning()) {
-            PlayerUtils.sendError(player, COKCore.NAME, "Game is already running!");
+        if (game.isStopped()) {
+            PlayerUtils.sendError(player, COKCore.NAME, "Game is not running!");
             return;
         }
 
         EnumTeam team = EnumTeam.byString(argumentList.getString(0));
         game.getTeamData(team).setSpawn(player.getLocation());
+        int amount = argumentList.getInt(1, 0);
+        if (amount < 1) {
+            PlayerUtils.sendError(player, COKCore.NAME, "The minimum is 1 block!");
+            return;
+        }
 
-        PlayerUtils.sendSuccess(player, COKCore.NAME, "Spawn for " + team.getFullTeamName(ChatColor.GREEN) + " set!");
+        game.punish(amount, team, true);
     }
 }

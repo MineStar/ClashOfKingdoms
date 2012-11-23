@@ -1,5 +1,7 @@
 package de.minestar.clashofkingdoms.data;
 
+import org.bukkit.block.Block;
+
 import de.minestar.clashofkingdoms.utils.BlockVector;
 
 public class BaseBlock {
@@ -25,4 +27,14 @@ public class BaseBlock {
         return vector;
     }
 
+    public boolean addBlock(COKGame game) {
+        for (int y = 1; y <= game.getSettings().getBaseHeight(); y++) {
+            Block block = this.vector.getRelative(0, y, 0).getLocation().getBlock();
+            if (block.getTypeId() != game.getSettings().getBaseTypeID() || block.getData() != game.getSettings().getBaseSubID()) {
+                block.setTypeIdAndData(game.getSettings().getBaseTypeID(), game.getSettings().getBaseSubID(), true);
+                return true;
+            }
+        }
+        return false;
+    }
 }
