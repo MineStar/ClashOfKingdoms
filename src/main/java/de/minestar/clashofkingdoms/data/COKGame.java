@@ -14,8 +14,8 @@ public class COKGame {
 
     private static final String GAME_JOIN = "'%s' has joined the game!";
     private static final String GAME_QUIT = "'%s' has left the game!";
-    private static final String TEAM_SWITCH = "'%s' is now in Team %s!";
-    private static final String TEAM_TOO_FEW = "Team %s has too few players!";
+    private static final String TEAM_SWITCH = "'%s' is now in %s!";
+    private static final String TEAM_TOO_FEW = "%s has too few players!";
 
     private static final int MIN_PLAYERS_PER_TEAM = 1;
 
@@ -75,7 +75,20 @@ public class COKGame {
             if (player.isInTeam(EnumTeam.RED) || player.isInTeam(EnumTeam.BLU)) {
                 player.clearInventory();
             }
-            this.sendMessageToAll(ChatColor.GRAY, String.format(TEAM_SWITCH, playerName, newTeam.name()));
+
+            if (this.isStopped() && !newTeam.equals(EnumTeam.REF)) {
+                if (this.teamData.get(EnumTeam.NONE).getSpawn() != null) {
+                    player.getBukkitPlayer().teleport(this.teamData.get(EnumTeam.NONE).getSpawn());
+                }
+            } else {
+                if (this.teamData.get(newTeam).getSpawn() != null) {
+                    player.getBukkitPlayer().teleport(this.teamData.get(newTeam).getSpawn());
+                } else if (this.teamData.get(EnumTeam.NONE).getSpawn() != null) {
+                    player.getBukkitPlayer().teleport(this.teamData.get(EnumTeam.NONE).getSpawn());
+                }
+            }
+
+            this.sendMessageToAll(ChatColor.GRAY, String.format(TEAM_SWITCH, playerName, newTeam.getFullTeamName(ChatColor.GRAY)));
             return true;
         }
         return false;
@@ -98,6 +111,18 @@ public class COKGame {
             this.playerList.put(player.getPlayerName(), player);
             this.teamData.get(team).addPlayer(player);
             this.sendMessageToAll(ChatColor.GRAY, String.format(GAME_JOIN, playerName));
+
+            if (this.isStopped() && !team.equals(EnumTeam.REF)) {
+                if (this.teamData.get(EnumTeam.NONE).getSpawn() != null) {
+                    player.getBukkitPlayer().teleport(this.teamData.get(EnumTeam.NONE).getSpawn());
+                }
+            } else {
+                if (this.teamData.get(team).getSpawn() != null) {
+                    player.getBukkitPlayer().teleport(this.teamData.get(team).getSpawn());
+                } else if (this.teamData.get(EnumTeam.NONE).getSpawn() != null) {
+                    player.getBukkitPlayer().teleport(this.teamData.get(EnumTeam.NONE).getSpawn());
+                }
+            }
             return true;
         }
         return false;
@@ -106,12 +131,17 @@ public class COKGame {
     public boolean playerQuitGame(String playerName) {
         COKPlayer player = this.getPlayer(playerName);
         if (player != null && this.gameManager.removeFromPlayerList(player)) {
+            // teleport to none spawn
+            if (this.teamData.get(EnumTeam.NONE).getSpawn() != null) {
+                player.getBukkitPlayer().teleport(this.teamData.get(EnumTeam.NONE).getSpawn());
+            }
+
             player.clearInventory();
             this.teamData.get(player.getTeam()).removePlayer(player);
             this.playerList.remove(player.getPlayerName());
             this.sendMessageToAll(ChatColor.GRAY, String.format(GAME_QUIT, playerName));
             if (this.teamData.get(player.getTeam()).getPlayerCount() < MIN_PLAYERS_PER_TEAM) {
-                this.sendMessageToAll(ChatColor.RED, String.format(TEAM_TOO_FEW, player.getTeam().name()));
+                this.sendMessageToAll(ChatColor.RED, String.format(TEAM_TOO_FEW, player.getTeam().getFullTeamName(ChatColor.RED)));
                 this.pauseGame();
             }
             return true;
@@ -148,13 +178,13 @@ public class COKGame {
 
         // CHECK PLAYERCOUNT
         if (this.teamData.get(EnumTeam.RED).getPlayerCount() < MIN_PLAYERS_PER_TEAM) {
-            this.sendMessageToAll(ChatColor.RED, String.format(TEAM_TOO_FEW, EnumTeam.RED.name()));
+            this.sendMessageToAll(ChatColor.RED, String.format(TEAM_TOO_FEW, EnumTeam.RED.getFullTeamName(ChatColor.RED)));
             return;
         }
 
         // CHECK PLAYERCOUNT
         if (this.teamData.get(EnumTeam.BLU).getPlayerCount() < MIN_PLAYERS_PER_TEAM) {
-            this.sendMessageToAll(ChatColor.RED, String.format(TEAM_TOO_FEW, EnumTeam.BLU.name()));
+            this.sendMessageToAll(ChatColor.RED, String.format(TEAM_TOO_FEW, EnumTeam.BLU.getFullTeamName(ChatColor.RED)));
             return;
         }
 

@@ -121,6 +121,7 @@ public class GameSettings {
             e.printStackTrace();
         }
     }
+
     private void savePlayerClasses(File thisGameDir) {
         for (PlayerClass clazz : this.playerClassList) {
             clazz.saveConfig(new File(thisGameDir, clazz.getClassName() + ".cls"));

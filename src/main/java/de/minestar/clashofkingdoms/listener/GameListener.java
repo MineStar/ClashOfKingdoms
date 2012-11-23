@@ -39,8 +39,8 @@ public class GameListener implements Listener {
 
     private static final Set<Integer> nonPushableBlocks = new HashSet<Integer>(Arrays.asList(0, 6, 7, 8, 9, 10, 11, 23, 26, 30, 31, 32, 34, 37, 38, 39, 40, 50, 51, 52, 55, 59, 61, 62, 63, 64, 65, 68, 69, 70, 71, 72, 75, 76, 77, 81, 83, 84, 86, 90, 91, 92, 93, 94, 96, 103, 104, 105, 106, 111, 115, 116, 117, 119, 120, 122, 127, 130, 131, 132, Material.FLOWER_POT.getId()));
 
-    private static final String BLOCK_PLACE = ChatColor.GOLD + "[COK] %s" + ChatColor.WHITE + " placed a block at the base of Team %s!";
-    private static final String GAME_WIN = ChatColor.GOLD + "[COK] %s" + ChatColor.WHITE + " has won the game!";
+    private static final String BLOCK_PLACE = ChatColor.GOLD + "[COK] %s" + ChatColor.WHITE + " placed a block at the base of %s!";
+    private static final String GAME_WIN = ChatColor.GOLD + "[COK] %s has won the game!";
 
     private GameManager gameManager;
     private BlockVector vector = new BlockVector("", 0, 0, 0);
@@ -114,7 +114,7 @@ public class GameListener implements Listener {
                 // handle blockplace on BLU BASE
                 if (game.isRunning() && game.isBaseBlock(EnumTeam.BLU, vector)) {
                     if (event.getBlock().getTypeId() == game.getSettings().getBaseTypeID() && event.getBlock().getData() == game.getSettings().getBaseSubID()) {
-                        game.sendMessageToAll(String.format(BLOCK_PLACE, (ChatColor.RED + player.getName()), (ChatColor.BLUE) + "BLU"));
+                        game.sendMessageToAll(String.format(BLOCK_PLACE, (ChatColor.RED + player.getName()), EnumTeam.BLU.getFullTeamName(ChatColor.WHITE)));
                         this.checkForWinner(game, EnumTeam.BLU);
                     } else {
                         this.gameManager.getPlayer(player.getName()).sendMessage(ChatColor.RED + "Wrong blocktype!");
@@ -134,7 +134,7 @@ public class GameListener implements Listener {
                 // handle blockplace on RED BASE
                 if (game.isRunning() && game.isBaseBlock(EnumTeam.RED, vector)) {
                     if (event.getBlock().getTypeId() == game.getSettings().getBaseTypeID() && event.getBlock().getData() == game.getSettings().getBaseSubID()) {
-                        game.sendMessageToAll(String.format(BLOCK_PLACE, (ChatColor.BLUE + player.getName()), (ChatColor.RED) + "RED"));
+                        game.sendMessageToAll(String.format(BLOCK_PLACE, (ChatColor.BLUE + player.getName()), EnumTeam.RED.getFullTeamName(ChatColor.WHITE)));
                         this.checkForWinner(game, EnumTeam.RED);
                     } else {
                         this.gameManager.getPlayer(player.getName()).sendMessage(ChatColor.RED + "Wrong blocktype!");
@@ -150,7 +150,7 @@ public class GameListener implements Listener {
                 // handle blockplace on bases
                 if (game.isBaseBlock(EnumTeam.RED, vector)) {
                     if (event.getBlock().getTypeId() == game.getSettings().getBaseTypeID() && event.getBlock().getData() == game.getSettings().getBaseSubID()) {
-                        game.sendMessageToAll(String.format(BLOCK_PLACE, (ChatColor.DARK_GRAY + player.getName()), (ChatColor.RED) + "RED"));
+                        game.sendMessageToAll(String.format(BLOCK_PLACE, (ChatColor.DARK_GRAY + player.getName()), EnumTeam.RED.getFullTeamName(ChatColor.WHITE)));
                         this.checkForWinner(game, EnumTeam.RED);
                     } else {
                         this.gameManager.getPlayer(player.getName()).sendMessage(ChatColor.RED + "Wrong blocktype!");
@@ -159,7 +159,7 @@ public class GameListener implements Listener {
                     }
                 } else if (game.isBaseBlock(EnumTeam.BLU, vector)) {
                     if (event.getBlock().getTypeId() == game.getSettings().getBaseTypeID() && event.getBlock().getData() == game.getSettings().getBaseSubID()) {
-                        game.sendMessageToAll(String.format(BLOCK_PLACE, (ChatColor.DARK_GRAY + player.getName()), (ChatColor.BLUE) + "BLU"));
+                        game.sendMessageToAll(String.format(BLOCK_PLACE, (ChatColor.DARK_GRAY + player.getName()), EnumTeam.BLU.getFullTeamName(ChatColor.WHITE)));
                         this.checkForWinner(game, EnumTeam.BLU);
                     } else {
                         this.gameManager.getPlayer(player.getName()).sendMessage(ChatColor.RED + "Wrong blocktype!");
@@ -176,7 +176,6 @@ public class GameListener implements Listener {
             }
         }
     }
-
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerMove(PlayerMoveEvent event) {
         // only blockchanges
@@ -192,6 +191,11 @@ public class GameListener implements Listener {
 
         // cancel movement, if the game is paused
         COKGame game = this.gameManager.getGameByPlayer(player.getName());
+
+        if (game.isRunning() || game.isStopped()) {
+            return;
+        }
+
         if (game.isPaused() && !game.getPlayer(player.getName()).isInTeam(EnumTeam.REF)) {
             event.setTo(event.getFrom().clone());
             return;
@@ -227,10 +231,10 @@ public class GameListener implements Listener {
     private void checkForWinner(COKGame game, EnumTeam team) {
         if (game.isBaseComplete(team)) {
             if (team.equals(EnumTeam.RED)) {
-                game.sendMessageToAll(String.format(GAME_WIN, (ChatColor.BLUE) + "TEAM BLU"));
+                game.sendMessageToAll(String.format(GAME_WIN, EnumTeam.BLU.getFullTeamName(ChatColor.GOLD)));
                 game.stopGame();
             } else if (team.equals(EnumTeam.BLU)) {
-                game.sendMessageToAll(String.format(GAME_WIN, (ChatColor.RED) + "TEAM RED"));
+                game.sendMessageToAll(String.format(GAME_WIN, EnumTeam.RED.getFullTeamName(ChatColor.GOLD)));
                 game.stopGame();
             }
         }

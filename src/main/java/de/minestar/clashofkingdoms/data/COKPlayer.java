@@ -67,6 +67,10 @@ public class COKPlayer {
         this.team = team;
     }
 
+    public Player getBukkitPlayer() {
+        return bukkitPlayer;
+    }
+
     public boolean isInTeam(EnumTeam otherTeam) {
         return this.getTeam().equals(otherTeam);
     }

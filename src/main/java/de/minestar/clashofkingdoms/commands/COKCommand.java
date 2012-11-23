@@ -22,7 +22,8 @@ public class COKCommand extends AbstractCommand {
         this.registerCommand(new QuitGameCommand());
 
         // settings
-        this.registerCommand(new CreateSettingsCommand());
+        this.registerCommand(new SaveSettingsCommand());
         this.registerCommand(new LoadSettingsCommand());
+        this.registerCommand(new SetSpawnCommand());
     }
 }
