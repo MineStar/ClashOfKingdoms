@@ -21,6 +21,11 @@ public class JoinGameCommand extends AbstractCommand {
 
     @Override
     public void execute(Player player, ArgumentList argumentList) {
+        if (COKCore.gameManager.isPlayerInAnyGame(player.getName())) {
+            PlayerUtils.sendError(player, COKCore.NAME, "You are already in a game!");
+            return;
+        }
+
         COKGame game = COKCore.gameManager.getGame(argumentList.getString(0));
         if (game == null) {
             PlayerUtils.sendError(player, COKCore.NAME, "Game '" + argumentList.getString(0) + "' not found!");

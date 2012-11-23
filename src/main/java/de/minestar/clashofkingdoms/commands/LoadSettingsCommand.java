@@ -15,9 +15,9 @@ import de.minestar.library.commandsystem.annotations.Label;
 import de.minestar.library.commandsystem.annotations.PermissionNode;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
 
-@Label(label = "loadsettings")
+@Label(label = "load")
 @Arguments(arguments = "<SETTINGSNAME>")
-@PermissionNode(node = "cok.commands.loadsettings")
+@PermissionNode(node = "cok.commands.load")
 @Description(description = "Load settings")
 public class LoadSettingsCommand extends AbstractCommand {
 

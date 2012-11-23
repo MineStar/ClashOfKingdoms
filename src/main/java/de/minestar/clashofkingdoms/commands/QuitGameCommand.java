@@ -22,12 +22,12 @@ public class QuitGameCommand extends AbstractCommand {
     public void execute(Player player, ArgumentList argumentList) {
         COKGame game = COKCore.gameManager.getGameByPlayer(player.getName());
         if (game == null) {
-            PlayerUtils.sendError(player, COKCore.NAME, "You are currently not in a game!");
+            PlayerUtils.sendError(player, COKCore.NAME, "You must be in a game!");
             return;
         }
 
         if (game.playerQuitGame(player.getName())) {
-            PlayerUtils.sendSuccess(player, COKCore.NAME, "You  have left the game!");
+            PlayerUtils.sendSuccess(player, COKCore.NAME, "You have left the game!");
         }
     }
 }

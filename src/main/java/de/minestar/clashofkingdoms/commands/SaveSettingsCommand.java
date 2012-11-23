@@ -15,9 +15,9 @@ import de.minestar.library.commandsystem.annotations.Label;
 import de.minestar.library.commandsystem.annotations.PermissionNode;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
 
-@Label(label = "savesettings")
+@Label(label = "save")
 @Arguments(arguments = "<SETTINGSNAME>")
-@PermissionNode(node = "cok.commands.savesettings")
+@PermissionNode(node = "cok.commands.save")
 @Description(description = "Save settings")
 public class SaveSettingsCommand extends AbstractCommand {
 
@@ -25,12 +25,12 @@ public class SaveSettingsCommand extends AbstractCommand {
     public void execute(Player player, ArgumentList argumentList) {
         COKGame game = COKCore.gameManager.getGameByPlayer(player.getName());
         if (game == null) {
-            PlayerUtils.sendError(player, COKCore.NAME, "You are currently not in a game!");
+            PlayerUtils.sendError(player, COKCore.NAME, "You must be in a game!");
             return;
         }
 
         if (!game.getPlayer(player.getName()).isInTeam(EnumTeam.REF)) {
-            PlayerUtils.sendError(player, COKCore.NAME, "You are not a referee!");
+            PlayerUtils.sendError(player, COKCore.NAME, "You must be a referee!");
             return;
         }
 
