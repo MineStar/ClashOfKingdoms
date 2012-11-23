@@ -8,7 +8,7 @@ public enum EnumPlayerClass {
 
     KNIGHT("Knight", KnightClass.class),
 
-    REFEREE("Referee", KnightClass.class);
+    REFEREE("Referee", RefereeClass.class);
 
     private final String typeName;
     private final Class<? extends PlayerClass> clazz;
