@@ -13,6 +13,15 @@ public class LeaderClass extends PlayerClass {
     }
 
     @Override
+    public void init() {
+        this.registerItem(new ItemStack(Material.GOLD_HELMET.getId(), 1));
+        this.registerItem(new ItemStack(Material.DIAMOND_CHESTPLATE.getId(), 1));
+        this.registerItem(new ItemStack(Material.DIAMOND_LEGGINGS.getId(), 1));
+        this.registerItem(new ItemStack(Material.GOLD_BOOTS.getId(), 1));
+        this.registerItem(new ItemStack(Material.DIAMOND_SWORD.getId(), 1));
+    }
+
+    @Override
     public void defaultConfig(YamlConfiguration config) {
         ArrayList<String> stringList = new ArrayList<String>();
         stringList.add(PlayerClass.ItemStackToString(new ItemStack(Material.GOLD_HELMET.getId(), 1)));

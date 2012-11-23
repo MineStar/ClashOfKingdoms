@@ -13,6 +13,13 @@ public class ArcherClass extends PlayerClass {
     }
 
     @Override
+    public void init() {
+        this.registerItem(new ItemStack(Material.BOW.getId(), 1));
+        this.registerItem(new ItemStack(Material.ARROW.getId(), 32));
+        this.registerItem(new ItemStack(Material.LEATHER_HELMET.getId(), 1));
+    }
+
+    @Override
     public void defaultConfig(YamlConfiguration config) {
         ArrayList<String> stringList = new ArrayList<String>();
         stringList.add(PlayerClass.ItemStackToString(new ItemStack(Material.BOW.getId(), 1)));

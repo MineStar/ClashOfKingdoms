@@ -62,7 +62,10 @@ public abstract class PlayerClass {
     public PlayerClass(String className, double punishMultiplicator) {
         this.className = className;
         this.punishMultiplicator = punishMultiplicator;
+        this.init();
     }
+
+    public abstract void init();
 
     public final void registerItem(ItemStack itemStack) {
         this.itemList.add(itemStack);
@@ -121,6 +124,10 @@ public abstract class PlayerClass {
         this.enabled = enabled;
     }
 
+    private void clearItems() {
+        this.itemList.clear();
+    }
+
     public static PlayerClass loadFromSettings(File file) {
         if (!file.exists()) {
             return null;
@@ -137,6 +144,8 @@ public abstract class PlayerClass {
             }
 
             PlayerClass instance = typeEnum.getClazz().newInstance();
+            instance.clearItems();
+
             List<String> itemList = config.getStringList("class.items");
             if (itemList != null) {
                 for (String text : itemList) {
