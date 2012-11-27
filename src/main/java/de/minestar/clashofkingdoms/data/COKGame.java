@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 
 import de.minestar.clashofkingdoms.COKCore;
@@ -125,6 +126,11 @@ public class COKGame {
     public void getRandomizedPlayerClass(EnumTeam team, PlayerClass playerClass) {
         // only team red & team blu
         if (!team.equals(EnumTeam.RED) && !team.equals(EnumTeam.BLU)) {
+            return;
+        }
+
+        // playerclass must be enabled
+        if (!playerClass.isEnabled()) {
             return;
         }
 
@@ -299,6 +305,7 @@ public class COKGame {
             }
 
             player.getBukkitPlayer().teleport(location);
+            player.getBukkitPlayer().setGameMode(GameMode.SURVIVAL);
         }
 
         // get new classes
@@ -368,6 +375,7 @@ public class COKGame {
             if (clazz.equals(EnumPlayerClass.REFEREE)) {
                 continue;
             }
+
             if (!this.hasPlayerClass(team, clazz)) {
                 this.getRandomizedPlayerClass(team, this.settings.getPlayerClass(clazz.getClassName()));
             }
