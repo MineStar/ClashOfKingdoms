@@ -225,6 +225,10 @@ public class COKGame {
             // show the player
             this.showPlayer(player);
 
+            player.getBukkitPlayer().setAllowFlight(false);
+            MinestarCore.getPlayer(player.getBukkitPlayer()).setBoolean("flight.forceCheck", false);
+            MinestarCore.getPlayer(player.getBukkitPlayer()).setBoolean("flight.allowFlight", false);
+
             // send info
             this.sendMessageToAll(ChatColor.GRAY, String.format(GAME_QUIT, playerName));
 
