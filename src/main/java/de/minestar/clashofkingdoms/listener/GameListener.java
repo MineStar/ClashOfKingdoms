@@ -9,6 +9,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -29,6 +30,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -38,7 +40,6 @@ import org.bukkit.inventory.ItemStack;
 import com.bukkit.gemo.utils.BlockUtils;
 
 import de.minestar.clashofkingdoms.COKCore;
-import de.minestar.clashofkingdoms.classes.EnumPlayerClass;
 import de.minestar.clashofkingdoms.classes.PlayerClass;
 import de.minestar.clashofkingdoms.data.COKGame;
 import de.minestar.clashofkingdoms.data.COKPlayer;
@@ -226,6 +227,19 @@ public class GameListener implements Listener {
         game.onPlayerDisconnect(player.getName());
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onPlayerKick(PlayerKickEvent event) {
+        Player player = event.getPlayer();
+
+        // is the player in a game?
+        if (!this.gameManager.isPlayerInAnyGame(player.getName())) {
+            return;
+        }
+
+        COKGame game = this.gameManager.getGameByPlayer(player.getName());
+        game.onPlayerDisconnect(player.getName());
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity().getPlayer();
@@ -265,15 +279,53 @@ public class GameListener implements Listener {
                 }
             }
         }
+
         if (event.getDamager().getType().equals(EntityType.PLAYER)) {
             Player player = (Player) event.getDamager();
             // is the player in a game?
-            if (!this.gameManager.isPlayerInAnyGame(player.getName())) {
+            if (this.gameManager.isPlayerInAnyGame(player.getName())) {
                 // cancel damage, if not a player
                 if (this.gameManager.getPlayer(player.getName()).isInTeam(EnumTeam.SPEC) || this.gameManager.getPlayer(player.getName()).isInTeam(EnumTeam.REF)) {
                     event.setDamage(0);
                     event.setCancelled(true);
                     return;
+                }
+            } else {
+                if (event.getEntityType().equals(EntityType.PLAYER)) {
+                    Player otherPlayer = (Player) event.getEntity();
+                    // is the player in a game?
+                    if (this.gameManager.isPlayerInAnyGame(otherPlayer.getName())) {
+                        // cancel damage
+                        event.setDamage(0);
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+            }
+        }
+        if (event.getDamager().getType().equals(EntityType.ARROW)) {
+            Arrow arrow = (Arrow) event.getDamager();
+            if (arrow.getShooter().getType().equals(EntityType.PLAYER)) {
+                Player player = (Player) arrow.getShooter();
+                // is the player in a game?
+                if (this.gameManager.isPlayerInAnyGame(player.getName())) {
+                    // cancel damage, if not a player
+                    if (this.gameManager.getPlayer(player.getName()).isInTeam(EnumTeam.SPEC) || this.gameManager.getPlayer(player.getName()).isInTeam(EnumTeam.REF)) {
+                        event.setDamage(0);
+                        event.setCancelled(true);
+                        return;
+                    }
+                } else {
+                    if (event.getEntityType().equals(EntityType.PLAYER)) {
+                        Player otherPlayer = (Player) event.getEntity();
+                        // is the player in a game?
+                        if (this.gameManager.isPlayerInAnyGame(otherPlayer.getName())) {
+                            // cancel damage
+                            event.setDamage(0);
+                            event.setCancelled(true);
+                            return;
+                        }
+                    }
                 }
             }
         }
@@ -290,29 +342,18 @@ public class GameListener implements Listener {
 
         // teleport to teamspawn
         COKGame game = this.gameManager.getGameByPlayer(player.getName());
-        EnumTeam team = game.getPlayer(player.getName()).getTeam();
+        COKPlayer cokPlayer = game.getPlayer(player.getName());
+        EnumTeam team = cokPlayer.getTeam();
         if (game.isStopped()) {
             team = EnumTeam.SPEC;
         } else {
-            if (team.equals(EnumTeam.RED) || team.equals(EnumTeam.BLU)) {
-                // get new classes
-                for (PlayerClass playerClass : game.getSettings().getPlayerClassList()) {
-
-                    if (playerClass.getClassName().equalsIgnoreCase(EnumPlayerClass.REFEREE.getClassName())) {
-                        continue;
-                    }
-
-                    if (!playerClass.isEnabled()) {
-                        continue;
-                    }
-
-                    if (game.getTeamData(team).getCurrentClass(EnumPlayerClass.byType(playerClass.getClassName())) != null) {
-                        continue;
-                    }
-
-                    game.getRandomizedPlayerClass(team, playerClass);
+            // get the new playerclass, if there was one
+            if (cokPlayer.isInTeam(EnumTeam.RED) || cokPlayer.isInTeam(EnumTeam.BLU)) {
+                cokPlayer.setPlayerClass(null);
+                PlayerClass clazz = cokPlayer.getPlayerClass();
+                if (clazz != null) {
+                    game.getRandomizedPlayerClass(team, clazz);
                 }
-
             }
         }
 
@@ -324,6 +365,7 @@ public class GameListener implements Listener {
             }
         }
     }
+
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerItemPickup(PlayerPickupItemEvent event) {
         Player player = event.getPlayer();
@@ -386,6 +428,7 @@ public class GameListener implements Listener {
         if (!game.isRunning() || cokPlayer.isInTeam(EnumTeam.REF)) {
             game.sendMessageToAll(message);
         } else {
+            game.sendMessageToTeam(message, EnumTeam.REF);
             game.sendMessageToTeam(message, cokPlayer.getTeam());
         }
     }

@@ -64,12 +64,26 @@ public class COKPlayer {
     }
 
     public void setTeam(EnumTeam team) {
+        // update the playerclass
+        if (this.playerClass != null) {
+            this.game.getRandomizedPlayerClass(this.team, this.playerClass);
+        }
+
         this.team = team;
+        this.playerClass = null;
         if (team.equals(EnumTeam.SPEC)) {
             game.hidePlayer(this);
         } else {
             game.showPlayer(this);
         }
+    }
+
+    public PlayerClass getPlayerClass() {
+        return playerClass;
+    }
+
+    public void setPlayerClass(PlayerClass playerClass) {
+        this.playerClass = playerClass;
     }
 
     public Player getBukkitPlayer() {
@@ -80,12 +94,7 @@ public class COKPlayer {
         return this.getTeam().equals(otherTeam);
     }
 
-    public PlayerClass getPlayerClass() {
-        return playerClass;
-    }
-
-    public void setPlayerClass(PlayerClass playerClass) {
-        this.playerClass = playerClass;
-        this.game.updatePlayerClass(playerClass, this);
+    public boolean equals(COKPlayer other) {
+        return this.playerName.equalsIgnoreCase(other.playerName);
     }
 }
