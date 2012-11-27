@@ -204,14 +204,15 @@ public class COKGame {
 
             // get the new playerclass, if there was one
             if (player.isInTeam(EnumTeam.RED) || player.isInTeam(EnumTeam.BLU)) {
-
-                PlayerClass clazz = player.getPlayerClass();
-                if (clazz != null) {
-                    String oldClass = clazz.getClassName();
-                    int punishBlocks = (int) Math.ceil((this.getTeamData(player.getTeam()).getBaseBlockCount() * clazz.getPunishMultiplicator()));
-                    this.punish(punishBlocks, player.getTeam(), false);
-                    this.getRandomizedPlayerClass(player.getTeam(), this.settings.getPlayerClass(oldClass));
-                    player.setPlayerClass(null);
+                if (!this.isStopped()) {
+                    PlayerClass clazz = player.getPlayerClass();
+                    if (clazz != null) {
+                        String oldClass = clazz.getClassName();
+                        int punishBlocks = (int) Math.ceil((this.getTeamData(player.getTeam()).getBaseBlockCount() * clazz.getPunishMultiplicator()));
+                        this.punish(punishBlocks, player.getTeam(), false);
+                        this.getRandomizedPlayerClass(player.getTeam(), this.settings.getPlayerClass(oldClass));
+                        player.setPlayerClass(null);
+                    }
                 }
             }
 
