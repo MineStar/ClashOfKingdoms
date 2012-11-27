@@ -173,6 +173,11 @@ public class COKGame {
             this.teamData.get(team).addPlayer(player);
             this.sendMessageToAll(ChatColor.GRAY, String.format(GAME_JOIN, playerName, team.getFullTeamName(ChatColor.GRAY)));
 
+            if (!this.isStopped()) {
+                this.checkPlayerClasses(EnumTeam.RED);
+                this.checkPlayerClasses(EnumTeam.BLU);
+            }
+
             if (this.isStopped() && !team.equals(EnumTeam.REF)) {
                 if (this.teamData.get(EnumTeam.SPEC).getSpawn() != null) {
                     player.getBukkitPlayer().teleport(this.teamData.get(EnumTeam.SPEC).getSpawn());
