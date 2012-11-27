@@ -312,6 +312,13 @@ public class COKGame {
 
             player.getBukkitPlayer().teleport(location);
             player.getBukkitPlayer().setGameMode(GameMode.SURVIVAL);
+
+            // allow flight for referees
+            if (player.isInTeam(EnumTeam.REF)) {
+                player.getBukkitPlayer().setAllowFlight(true);
+            } else {
+                player.getBukkitPlayer().setAllowFlight(false);
+            }
         }
 
         // get new classes
@@ -368,6 +375,7 @@ public class COKGame {
                 player.getBukkitPlayer().setHealth(20);
                 player.getBukkitPlayer().setFoodLevel(20);
             }
+            player.getBukkitPlayer().setAllowFlight(false);
             player.setPlayerClass(null);
         }
     }
