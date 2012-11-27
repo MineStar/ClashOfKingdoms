@@ -27,6 +27,8 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -380,6 +382,41 @@ public class GameListener implements Listener {
         if (game.getPlayer(player.getName()).isInTeam(EnumTeam.SPEC)) {
             event.setCancelled(true);
             return;
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onInventoryClick(InventoryClickEvent event) {
+        Player player = (Player) event.getWhoClicked();
+
+        // is the player in a game?
+        if (!this.gameManager.isPlayerInAnyGame(player.getName())) {
+            return;
+        }
+
+        // disallow itempickups for spectators
+        COKGame game = this.gameManager.getGameByPlayer(player.getName());
+
+        if (game.isStopped()) {
+            return;
+        }
+
+        COKPlayer cokPlayer = game.getPlayer(player.getName());
+        if (cokPlayer.isInTeam(EnumTeam.SPEC)) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (!event.getSlotType().equals(SlotType.ARMOR)) {
+            return;
+        }
+
+        int slotID = event.getRawSlot() - 5;
+        if (cokPlayer.getPlayerClass() != null) {
+            if (!cokPlayer.getPlayerClass().isArmorChangeAllowed(slotID)) {
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 

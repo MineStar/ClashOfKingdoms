@@ -17,6 +17,8 @@ public class ArcherClass extends PlayerClass {
         this.registerItem(new ItemStack(Material.BOW.getId(), 1));
         this.registerItem(new ItemStack(Material.ARROW.getId(), 32));
         this.registerItem(new ItemStack(Material.LEATHER_HELMET.getId(), 1));
+
+        this.setAllowChanges(0, false);
     }
 
     @Override

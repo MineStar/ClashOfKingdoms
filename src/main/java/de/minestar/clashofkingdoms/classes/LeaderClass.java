@@ -19,6 +19,10 @@ public class LeaderClass extends PlayerClass {
         this.registerItem(new ItemStack(Material.DIAMOND_LEGGINGS.getId(), 1));
         this.registerItem(new ItemStack(Material.GOLD_BOOTS.getId(), 1));
         this.registerItem(new ItemStack(Material.DIAMOND_SWORD.getId(), 1));
+        this.setAllowChanges(0, false);
+        this.setAllowChanges(1, false);
+        this.setAllowChanges(2, false);
+        this.setAllowChanges(3, false);
     }
 
     @Override

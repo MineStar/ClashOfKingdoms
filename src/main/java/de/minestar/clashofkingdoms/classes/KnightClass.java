@@ -17,6 +17,8 @@ public class KnightClass extends PlayerClass {
         this.registerItem(new ItemStack(Material.IRON_CHESTPLATE.getId(), 1));
         this.registerItem(new ItemStack(Material.IRON_LEGGINGS.getId(), 1));
         this.registerItem(new ItemStack(Material.IRON_SWORD.getId(), 1));
+        this.setAllowChanges(1, false);
+        this.setAllowChanges(2, false);
     }
 
     @Override

@@ -84,6 +84,11 @@ public class COKGame {
                 player.clearInventory();
             }
 
+            if (!this.isStopped()) {
+                this.checkPlayerClasses(EnumTeam.RED);
+                this.checkPlayerClasses(EnumTeam.BLU);
+            }
+
             if (this.isStopped() && !newTeam.equals(EnumTeam.REF)) {
                 if (this.teamData.get(EnumTeam.SPEC).getSpawn() != null) {
                     player.getBukkitPlayer().teleport(this.teamData.get(EnumTeam.SPEC).getSpawn());
@@ -347,11 +352,42 @@ public class COKGame {
         for (COKPlayer player : this.playerList.values()) {
             if (player.isInTeam(EnumTeam.RED) || player.isInTeam(EnumTeam.BLU)) {
                 player.clearInventory();
-                player.setPlayerClass(null);
                 player.getBukkitPlayer().setHealth(20);
                 player.getBukkitPlayer().setFoodLevel(20);
             }
+            player.setPlayerClass(null);
         }
+    }
+
+    public void checkPlayerClasses(EnumTeam team) {
+        if (!team.equals(EnumTeam.RED) && !team.equals(EnumTeam.BLU)) {
+            return;
+        }
+
+        for (EnumPlayerClass clazz : EnumPlayerClass.values()) {
+            if (clazz.equals(EnumPlayerClass.REFEREE)) {
+                continue;
+            }
+            if (!this.hasPlayerClass(team, clazz)) {
+                this.getRandomizedPlayerClass(team, this.settings.getPlayerClass(clazz.getClassName()));
+            }
+        }
+    }
+
+    private boolean hasPlayerClass(EnumTeam team, EnumPlayerClass clazz) {
+        if (!team.equals(EnumTeam.RED) && !team.equals(EnumTeam.BLU)) {
+            return true;
+        }
+
+        for (COKPlayer player : this.getTeamData(team).getPlayerList().values()) {
+            if (player.getPlayerClass() == null) {
+                continue;
+            }
+            if (player.getPlayerClass().getClassName().equals(clazz.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

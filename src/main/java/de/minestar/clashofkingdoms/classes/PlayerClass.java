@@ -17,55 +17,27 @@ public abstract class PlayerClass {
 
     public abstract void defaultConfig(YamlConfiguration config);
 
-    private void saveDefaultConfig(File file) {
-        if (file.exists()) {
-            file.delete();
-        }
-        try {
-            YamlConfiguration config = new YamlConfiguration();
-            this.defaultConfig(config);
-            config.set("class.type", this.getClassName());
-            config.set("class.punishMultiplicator", this.getPunishMultiplicator());
-            config.set("class.enabled", this.enabled);
-            config.save(file);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void saveConfig(File file) {
-        if (file.exists()) {
-            file.delete();
-        } else {
-            this.saveDefaultConfig(file);
-            return;
-        }
-
-        try {
-            YamlConfiguration config = new YamlConfiguration();
-
-            config.set("class.type", this.getClassName());
-            config.set("class.punishMultiplicator", this.getPunishMultiplicator());
-
-            ArrayList<String> stringList = new ArrayList<String>();
-            for (ItemStack stack : this.itemList) {
-                stringList.add(PlayerClass.ItemStackToString(stack));
-            }
-            config.set("class.items", stringList);
-            config.set("class.enabled", this.enabled);
-            config.save(file);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    private boolean[] allowChanges = new boolean[4];
 
     public PlayerClass(String className, double punishMultiplicator) {
         this.className = className;
         this.punishMultiplicator = punishMultiplicator;
+        this.allowChanges[0] = true;
+        this.allowChanges[1] = true;
+        this.allowChanges[2] = true;
+        this.allowChanges[3] = true;
         this.init();
     }
 
     public abstract void init();
+
+    protected void setAllowChanges(int index, boolean value) {
+        this.allowChanges[index] = value;
+    }
+
+    public boolean isArmorChangeAllowed(int index) {
+        return this.allowChanges[index];
+    }
 
     public final void registerItem(ItemStack itemStack) {
         this.itemList.add(itemStack);
@@ -170,6 +142,48 @@ public abstract class PlayerClass {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    private void saveDefaultConfig(File file) {
+        if (file.exists()) {
+            file.delete();
+        }
+        try {
+            YamlConfiguration config = new YamlConfiguration();
+            this.defaultConfig(config);
+            config.set("class.type", this.getClassName());
+            config.set("class.punishMultiplicator", this.getPunishMultiplicator());
+            config.set("class.enabled", this.enabled);
+            config.save(file);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void saveConfig(File file) {
+        if (file.exists()) {
+            file.delete();
+        } else {
+            this.saveDefaultConfig(file);
+            return;
+        }
+
+        try {
+            YamlConfiguration config = new YamlConfiguration();
+
+            config.set("class.type", this.getClassName());
+            config.set("class.punishMultiplicator", this.getPunishMultiplicator());
+
+            ArrayList<String> stringList = new ArrayList<String>();
+            for (ItemStack stack : this.itemList) {
+                stringList.add(PlayerClass.ItemStackToString(stack));
+            }
+            config.set("class.items", stringList);
+            config.set("class.enabled", this.enabled);
+            config.save(file);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
