@@ -57,8 +57,8 @@ public class GameManager {
 
         // close the game and remove it
         if (game != null) {
-            game.closeGame();
             this.gameList.remove(gameName.toLowerCase());
+            game.closeGame();
         }
         return game;
     }

@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import de.minestar.clashofkingdoms.COKCore;
 import de.minestar.clashofkingdoms.classes.PlayerClass;
 import de.minestar.clashofkingdoms.enums.EnumTeam;
+import de.minestar.core.MinestarCore;
 
 public class COKPlayer {
 
@@ -79,8 +80,12 @@ public class COKPlayer {
 
         if (isInTeam(EnumTeam.REF) || isInTeam(EnumTeam.SPEC)) {
             this.getBukkitPlayer().setAllowFlight(true);
+            MinestarCore.getPlayer(this.getBukkitPlayer()).setBoolean("flight.forceCheck", false);
+            MinestarCore.getPlayer(this.getBukkitPlayer()).setBoolean("flight.allowFlight", true);
         } else {
             this.getBukkitPlayer().setAllowFlight(false);
+            MinestarCore.getPlayer(this.getBukkitPlayer()).setBoolean("flight.forceCheck", true);
+            MinestarCore.getPlayer(this.getBukkitPlayer()).setBoolean("flight.allowFlight", false);
         }
     }
 

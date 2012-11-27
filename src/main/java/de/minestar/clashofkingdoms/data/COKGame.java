@@ -15,6 +15,7 @@ import de.minestar.clashofkingdoms.enums.EnumTeam;
 import de.minestar.clashofkingdoms.enums.GameState;
 import de.minestar.clashofkingdoms.manager.GameManager;
 import de.minestar.clashofkingdoms.utils.BlockVector;
+import de.minestar.core.MinestarCore;
 
 public class COKGame {
 
@@ -376,6 +377,8 @@ public class COKGame {
                 player.getBukkitPlayer().setFoodLevel(20);
             }
             player.getBukkitPlayer().setAllowFlight(false);
+            MinestarCore.getPlayer(player.getBukkitPlayer()).setBoolean("flight.forceCheck", false);
+            MinestarCore.getPlayer(player.getBukkitPlayer()).setBoolean("flight.allowFlight", false);
             player.setPlayerClass(null);
         }
     }
@@ -435,7 +438,9 @@ public class COKGame {
         this.stopGame();
         for (COKPlayer player : this.playerList.values()) {
             this.showPlayer(player);
+            COKCore.gameManager.removeFromPlayerList(player);
         }
+
         this.sendMessageToAll(ChatColor.RED, "The game has been closed!");
         this.playerList.clear();
     }
