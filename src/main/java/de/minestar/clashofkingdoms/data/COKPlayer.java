@@ -76,6 +76,12 @@ public class COKPlayer {
         } else {
             game.showPlayer(this);
         }
+
+        if (isInTeam(EnumTeam.REF) || isInTeam(EnumTeam.SPEC)) {
+            this.getBukkitPlayer().setAllowFlight(true);
+        } else {
+            this.getBukkitPlayer().setAllowFlight(false);
+        }
     }
 
     public PlayerClass getPlayerClass() {

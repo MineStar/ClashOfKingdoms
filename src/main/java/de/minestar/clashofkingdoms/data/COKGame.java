@@ -314,7 +314,7 @@ public class COKGame {
             player.getBukkitPlayer().setGameMode(GameMode.SURVIVAL);
 
             // allow flight for referees
-            if (player.isInTeam(EnumTeam.REF)) {
+            if (player.isInTeam(EnumTeam.REF) || player.isInTeam(EnumTeam.SPEC)) {
                 player.getBukkitPlayer().setAllowFlight(true);
             } else {
                 player.getBukkitPlayer().setAllowFlight(false);
