@@ -26,6 +26,7 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -40,6 +41,7 @@ import de.minestar.clashofkingdoms.COKCore;
 import de.minestar.clashofkingdoms.classes.EnumPlayerClass;
 import de.minestar.clashofkingdoms.classes.PlayerClass;
 import de.minestar.clashofkingdoms.data.COKGame;
+import de.minestar.clashofkingdoms.data.COKPlayer;
 import de.minestar.clashofkingdoms.enums.EnumTeam;
 import de.minestar.clashofkingdoms.manager.GameManager;
 import de.minestar.clashofkingdoms.utils.BlockVector;
@@ -253,31 +255,26 @@ public class GameListener implements Listener {
     public void onPlayerDamage(EntityDamageByEntityEvent event) {
         if (event.getEntityType().equals(EntityType.PLAYER)) {
             Player player = (Player) event.getEntity();
-
             // is the player in a game?
-            if (!this.gameManager.isPlayerInAnyGame(player.getName())) {
-                return;
+            if (this.gameManager.isPlayerInAnyGame(player.getName())) {
+                // cancel damage, if not a player
+                if (this.gameManager.getPlayer(player.getName()).isInTeam(EnumTeam.SPEC) || this.gameManager.getPlayer(player.getName()).isInTeam(EnumTeam.REF)) {
+                    event.setDamage(0);
+                    event.setCancelled(true);
+                    return;
+                }
             }
-
-            // cancel damage, if not a player
-            if (this.gameManager.getPlayer(player.getName()).isInTeam(EnumTeam.SPEC) || this.gameManager.getPlayer(player.getName()).isInTeam(EnumTeam.REF)) {
-                event.setDamage(0);
-                event.setCancelled(true);
-                return;
-            }
-        } else if (event.getDamager().getType().equals(EntityType.PLAYER)) {
+        }
+        if (event.getDamager().getType().equals(EntityType.PLAYER)) {
             Player player = (Player) event.getDamager();
-
             // is the player in a game?
             if (!this.gameManager.isPlayerInAnyGame(player.getName())) {
-                return;
-            }
-
-            // cancel damage, if not a player
-            if (this.gameManager.getPlayer(player.getName()).isInTeam(EnumTeam.SPEC) || this.gameManager.getPlayer(player.getName()).isInTeam(EnumTeam.REF)) {
-                event.setDamage(0);
-                event.setCancelled(true);
-                return;
+                // cancel damage, if not a player
+                if (this.gameManager.getPlayer(player.getName()).isInTeam(EnumTeam.SPEC) || this.gameManager.getPlayer(player.getName()).isInTeam(EnumTeam.REF)) {
+                    event.setDamage(0);
+                    event.setCancelled(true);
+                    return;
+                }
             }
         }
     }
@@ -320,10 +317,10 @@ public class GameListener implements Listener {
         }
 
         if (game.getTeamData(team).getSpawn() != null) {
-            game.getPlayer(player.getName()).getBukkitPlayer().teleport(game.getTeamData(team).getSpawn());
+            event.setRespawnLocation(game.getTeamData(team).getSpawn());
         } else {
             if (game.getTeamData(EnumTeam.SPEC).getSpawn() != null) {
-                game.getPlayer(player.getName()).getBukkitPlayer().teleport(game.getTeamData(EnumTeam.SPEC).getSpawn());
+                event.setRespawnLocation(game.getTeamData(EnumTeam.SPEC).getSpawn());
             }
         }
     }
@@ -353,7 +350,7 @@ public class GameListener implements Listener {
             return;
         }
 
-        // teleport to teamspawn
+        // cancel interact for specs
         COKGame game = this.gameManager.getGameByPlayer(player.getName());
         if (game.getPlayer(player.getName()).isInTeam(EnumTeam.SPEC)) {
             event.setCancelled(true);
@@ -361,6 +358,37 @@ public class GameListener implements Listener {
         }
     }
 
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onPlayerChat(AsyncPlayerChatEvent event) {
+        Player player = event.getPlayer();
+
+        // is the player in a game?
+        if (!this.gameManager.isPlayerInAnyGame(player.getName())) {
+            return;
+        }
+
+        // cancel event
+        event.setCancelled(true);
+
+        COKGame game = this.gameManager.getGameByPlayer(player.getName());
+        COKPlayer cokPlayer = game.getPlayer(player.getName());
+        String message = ChatColor.WHITE + event.getMessage();
+        if (cokPlayer.isInTeam(EnumTeam.REF)) {
+            message = ChatColor.GOLD + player.getName() + ": " + message;
+        } else if (cokPlayer.isInTeam(EnumTeam.SPEC)) {
+            message = ChatColor.DARK_GRAY + player.getName() + ": " + message;
+        } else if (cokPlayer.isInTeam(EnumTeam.RED)) {
+            message = ChatColor.RED + player.getName() + ": " + message;
+        } else if (cokPlayer.isInTeam(EnumTeam.BLU)) {
+            message = ChatColor.BLUE + player.getName() + ": " + message;
+        }
+
+        if (!game.isRunning() || cokPlayer.isInTeam(EnumTeam.REF)) {
+            game.sendMessageToAll(message);
+        } else {
+            game.sendMessageToTeam(message, cokPlayer.getTeam());
+        }
+    }
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerItemDrop(PlayerDropItemEvent event) {
         Player player = event.getPlayer();

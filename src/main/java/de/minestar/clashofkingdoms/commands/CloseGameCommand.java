@@ -13,11 +13,11 @@ import de.minestar.library.commandsystem.annotations.Label;
 import de.minestar.library.commandsystem.annotations.PermissionNode;
 import de.minestar.minestarlibrary.utils.PlayerUtils;
 
-@Label(label = "team")
-@Arguments(arguments = "RED|BLU|REF|SPEC")
-@PermissionNode(node = "cok.commands.team")
-@Description(description = "Join a game")
-public class JoinTeamCommand extends AbstractCommand {
+@Label(label = "close")
+@Arguments(arguments = "")
+@PermissionNode(node = "cok.commands.close")
+@Description(description = "Close the game")
+public class CloseGameCommand extends AbstractCommand {
 
     @Override
     public void execute(Player player, ArgumentList argumentList) {
@@ -27,7 +27,11 @@ public class JoinTeamCommand extends AbstractCommand {
             return;
         }
 
-        EnumTeam team = EnumTeam.byString(argumentList.getString(0));
-        game.switchTeam(player.getName(), team);
+        if (!game.getPlayer(player.getName()).isInTeam(EnumTeam.REF)) {
+            PlayerUtils.sendError(player, COKCore.NAME, "You must be a referee!");
+            return;
+        }
+
+        COKCore.gameManager.closeGame(game.getGameName());
     }
 }

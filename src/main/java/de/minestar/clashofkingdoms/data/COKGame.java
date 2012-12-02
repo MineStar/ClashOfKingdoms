@@ -129,12 +129,14 @@ public class COKGame {
         }
 
         // find a randomized player
+        this.getTeamData(team).setCurrentClass(EnumPlayerClass.byType(playerClass.getClassName()), null);
         if (freePlayers.size() > 0) {
             Random random = new Random();
             int index = random.nextInt(freePlayers.size());
             COKPlayer player = freePlayers.get(index);
             player.setPlayerClass(playerClass);
             playerClass.giveItems(player.getBukkitPlayer());
+            this.getTeamData(team).setCurrentClass(EnumPlayerClass.byType(playerClass.getClassName()), player);
             this.sendMessageToAll(ChatColor.GRAY, String.format(PLAYER_CLASS_NEW, player.getPlayerName(), playerClass.getClassName(), team.getFullTeamName(ChatColor.GRAY)));
         }
     }
@@ -232,6 +234,14 @@ public class COKGame {
     //
     // ///////////////////////////////////////////////////////////////
 
+    public void sendMessageToTeam(String message, EnumTeam team) {
+        this.getTeamData(team).sendMessageToAll(message);
+    }
+
+    public void sendMessageToTeam(ChatColor color, String message, EnumTeam team) {
+        this.getTeamData(team).sendMessageToAll(color, message);
+    }
+
     public void sendMessageToAll(String message) {
         for (COKPlayer player : this.playerList.values()) {
             player.sendMessage(message);
@@ -305,7 +315,9 @@ public class COKGame {
      * Stop the game
      */
     public void stopGame() {
-        this.sendMessageToAll(ChatColor.GREEN, "The game has been stopped by an Admin!");
+        if (!this.isStopped()) {
+            this.sendMessageToAll(ChatColor.GREEN, "The game has been stopped by an Admin!");
+        }
         this.setGameState(GameState.STOPPED);
         this.resetGame();
     }
@@ -354,6 +366,10 @@ public class COKGame {
      */
     public void closeGame() {
         this.stopGame();
+        for (COKPlayer player : this.playerList.values()) {
+            this.showPlayer(player);
+        }
+        this.sendMessageToAll(ChatColor.RED, "The game has been closed!");
         this.playerList.clear();
     }
 
@@ -422,15 +438,25 @@ public class COKGame {
         for (COKPlayer otherPlayer : this.getTeamData(EnumTeam.RED).getPlayerList().values()) {
             otherPlayer.getBukkitPlayer().hidePlayer(player.getBukkitPlayer());
         }
+
+        for (COKPlayer otherPlayer : this.getTeamData(EnumTeam.BLU).getPlayerList().values()) {
+            otherPlayer.getBukkitPlayer().hidePlayer(player.getBukkitPlayer());
+        }
     }
 
     public void showPlayer(COKPlayer player) {
         for (COKPlayer otherPlayer : this.getTeamData(EnumTeam.RED).getPlayerList().values()) {
             otherPlayer.getBukkitPlayer().showPlayer(player.getBukkitPlayer());
         }
+
+        for (COKPlayer otherPlayer : this.getTeamData(EnumTeam.BLU).getPlayerList().values()) {
+            otherPlayer.getBukkitPlayer().showPlayer(player.getBukkitPlayer());
+        }
     }
 
     public void updatePlayerClass(PlayerClass playerClass, COKPlayer player) {
-        this.getTeamData(player.getTeam()).setCurrentClass(EnumPlayerClass.byType(playerClass.getClassName()), player);
+        if (playerClass != null) {
+            this.getTeamData(player.getTeam()).setCurrentClass(EnumPlayerClass.byType(playerClass.getClassName()), player);
+        }
     }
 }

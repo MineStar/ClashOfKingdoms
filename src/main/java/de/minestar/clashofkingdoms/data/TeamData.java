@@ -3,6 +3,7 @@ package de.minestar.clashofkingdoms.data;
 import java.util.HashMap;
 
 import org.apache.commons.lang.Validate;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -24,6 +25,16 @@ public class TeamData {
         this.blockBase = new BlockBase();
         this.playerList = new HashMap<String, COKPlayer>();
         this.currentClasses = new HashMap<EnumPlayerClass, COKPlayer>();
+    }
+
+    public void sendMessageToAll(String message) {
+        for (COKPlayer player : this.playerList.values()) {
+            player.sendMessage(message);
+        }
+    }
+
+    public void sendMessageToAll(ChatColor color, String message) {
+        this.sendMessageToAll(color + message);
     }
 
     public void setCurrentClass(EnumPlayerClass enumPlayerClass, COKPlayer player) {
