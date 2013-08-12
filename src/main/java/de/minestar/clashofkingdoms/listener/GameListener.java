@@ -275,7 +275,7 @@ public class GameListener implements Listener {
             if (this.gameManager.isPlayerInAnyGame(player.getName())) {
                 // cancel damage, if not a player
                 if (this.gameManager.getPlayer(player.getName()).isInTeam(EnumTeam.SPEC) || this.gameManager.getPlayer(player.getName()).isInTeam(EnumTeam.REF)) {
-                    event.setDamage(0);
+                    event.setDamage(0.0);
                     event.setCancelled(true);
                     return;
                 }
@@ -288,7 +288,7 @@ public class GameListener implements Listener {
             if (this.gameManager.isPlayerInAnyGame(player.getName())) {
                 // cancel damage, if not a player
                 if (this.gameManager.getPlayer(player.getName()).isInTeam(EnumTeam.SPEC) || this.gameManager.getPlayer(player.getName()).isInTeam(EnumTeam.REF)) {
-                    event.setDamage(0);
+                    event.setDamage(0.0);
                     event.setCancelled(true);
                     return;
                 }
@@ -298,7 +298,7 @@ public class GameListener implements Listener {
                     // is the player in a game?
                     if (this.gameManager.isPlayerInAnyGame(otherPlayer.getName())) {
                         // cancel damage
-                        event.setDamage(0);
+                        event.setDamage(0.0);
                         event.setCancelled(true);
                         return;
                     }
@@ -313,7 +313,7 @@ public class GameListener implements Listener {
                 if (this.gameManager.isPlayerInAnyGame(player.getName())) {
                     // cancel damage, if not a player
                     if (this.gameManager.getPlayer(player.getName()).isInTeam(EnumTeam.SPEC) || this.gameManager.getPlayer(player.getName()).isInTeam(EnumTeam.REF)) {
-                        event.setDamage(0);
+                        event.setDamage(0.0);
                         event.setCancelled(true);
                         return;
                     }
@@ -323,7 +323,7 @@ public class GameListener implements Listener {
                         // is the player in a game?
                         if (this.gameManager.isPlayerInAnyGame(otherPlayer.getName())) {
                             // cancel damage
-                            event.setDamage(0);
+                            event.setDamage(0.0);
                             event.setCancelled(true);
                             return;
                         }

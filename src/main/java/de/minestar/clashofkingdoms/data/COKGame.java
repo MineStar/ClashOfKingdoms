@@ -377,7 +377,7 @@ public class COKGame {
         for (COKPlayer player : this.playerList.values()) {
             if (player.isInTeam(EnumTeam.RED) || player.isInTeam(EnumTeam.BLU)) {
                 player.clearInventory();
-                player.getBukkitPlayer().setHealth(20);
+                player.getBukkitPlayer().setHealth(20.0);
                 player.getBukkitPlayer().setFoodLevel(20);
             }
             player.getBukkitPlayer().setAllowFlight(false);
@@ -440,6 +440,7 @@ public class COKGame {
      */
     public void closeGame() {
         this.stopGame();
+
         for (COKPlayer player : this.playerList.values()) {
             this.showPlayer(player);
             COKCore.gameManager.removeFromPlayerList(player);
